@@ -1,0 +1,21 @@
+# Ambientes e instalacoes locais (nao enviar para GitHub)
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Configuracoes e arquivos privados
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+
+# Arquivos locais
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
