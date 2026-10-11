@@ -32,8 +32,18 @@ def _base(fig, altura=435):
     return fig
 
 
-def grafico_mercado(resultado):
-    """Curvas, equilibrio, arrecadacao e peso morto para o dominio valido."""
+def _limites_mercado(resultado):
+    """Limites comparaveis sem desenhar demanda com preco negativo."""
+    a, b, c, d = (resultado[x] for x in ("a", "b", "c", "d"))
+    qmax = min(a / b, 1.45 * resultado["q0"])
+    y_candidatos = [a, c + d * qmax, resultado["pc"] or 0]
+    if resultado["t"] > 0 and resultado["ha_transacoes"]:
+        y_candidatos.append(c + d * qmax + resultado["t"])
+    return qmax * 1.03, max(y_candidatos) * 1.07
+
+
+def grafico_mercado(resultado, cenarios=None):
+    """Curvas, equilibrio e areas; cenarios permite usar escalas comuns."""
     a, b, c, d = (resultado[x] for x in ("a", "b", "c", "d"))
     t = resultado["t"]
     q0, qt, p0 = resultado["q0"], resultado["qt"], resultado["p0"]
@@ -88,7 +98,8 @@ def grafico_mercado(resultado):
         ))
 
     fig.add_trace(go.Scatter(
-        x=[q0], y=[p0], mode="markers", name="Equilíbrio inicial",
+        x=[q0], y=[p0], mode="markers+text", name="Equilíbrio inicial",
+        text=["E₀"], textposition="top right",
         marker=dict(size=11, color=COR_INICIAL, line=dict(color="white", width=2)),
         hovertemplate="Equilíbrio inicial<br>Q₀ = %{x:.2f}<br>P₀ = %{y:.2f}<extra></extra>",
     ))
@@ -107,10 +118,15 @@ def grafico_mercado(resultado):
             font=dict(color="#B66B19", size=13),
         )
 
-    ymax = max(a, c + d * q_max, (pc or 0)) * 1.07
+    escala = [resultado] if cenarios is None else [r for _, r in cenarios]
+    limites = [_limites_mercado(r) for r in escala]
+    max_q = max(limite[0] for limite in limites)
+    max_p = max(limite[1] for limite in limites)
+    # Guias pontilhadas ajudam a localizar as quantidades de equilibrio.
+    fig.add_vline(x=q0, line=dict(color="#B8C0CD", dash="dot", width=1))
     _base(fig, 440)
-    fig.update_xaxes(title="Quantidade (unidades por período)", range=[0, q_max * 1.03])
-    fig.update_yaxes(title="Preço por unidade", range=[0, ymax])
+    fig.update_xaxes(title="Quantidade (unidades por período)", range=[0, max_q])
+    fig.update_yaxes(title="Preço por unidade (R$/un.)", range=[0, max_p])
     return fig
 
 
@@ -154,11 +170,26 @@ def grafico_distorcao(resultados):
     """Receita e peso morto em cada cenario (escala monetaria comum)."""
     nomes = [nome for nome, _ in resultados]
     fig = go.Figure()
-    fig.add_bar(x=nomes, y=[r["arrecadacao"] for _, r in resultados],
-                name="Arrecadação", marker_color=COR_RECEITA)
-    fig.add_bar(x=nomes, y=[r["peso_morto"] for _, r in resultados],
-                name="Peso morto", marker_color=COR_PESO_MORTO)
+    receitas = [r["arrecadacao"] for _, r in resultados]
+    perdas = [r["peso_morto"] for _, r in resultados]
+    # Rotulos dentro das barras: contraste legivel em temas claro e escuro.
+    # Valores nulos permanecem visiveis na tabela abaixo do grafico.
+    fig.add_bar(x=nomes, y=receitas, name="Arrecadação", marker_color=COR_RECEITA,
+                text=[f"{v:.0f}" if v > 0 else "" for v in receitas],
+                textposition="inside", insidetextanchor="middle",
+                textfont=dict(color="#FFFFFF", size=13))
+    fig.add_bar(x=nomes, y=perdas, name="Peso morto", marker_color=COR_PESO_MORTO,
+                text=[f"{v:.0f}" if v > 0 else "" for v in perdas],
+                textposition="inside", insidetextanchor="middle",
+                textfont=dict(color="#FFFFFF", size=13))
     _base(fig, 350)
-    fig.update_layout(barmode="group", margin=dict(l=18, r=12, t=10, b=64))
+    fig.update_layout(barmode="group", margin=dict(l=18, r=12, t=18, b=64),
+                      uniformtext_minsize=12, uniformtext_mode="hide")
     fig.update_yaxes(title="Unidades monetárias / período")
+    if not any(receitas) and not any(perdas):
+        fig.add_annotation(
+            x=0.5, y=0.5, xref="paper", yref="paper",
+            text="Sem arrecadação nem peso morto",
+            showarrow=False, font=dict(color="#8997AC", size=14),
+        )
     return fig

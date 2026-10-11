@@ -92,13 +92,35 @@ def explicacao(resultado, experimento):
         )
     welfare = (
         f" A arrecadação é {moeda(resultado['arrecadacao'])} e a perda de "
-        f"eficiência é {moeda(resultado['peso_morto'])}; estes valores "
-        "representam conceitos distintos."
+        f"eficiência é {moeda(resultado['peso_morto'])}; são medidas diferentes."
     )
     if experimento == "Experimento A":
-        finalidade = " O experimento A isola a divisão do imposto entre os lados do mercado."
+        if parte_consumidor == 50:
+            mecanismo = (
+                "Como a oferta e a demanda têm a mesma elasticidade inicial, "
+                "os dois lados dividem igualmente o imposto."
+            )
+        elif parte_consumidor > 50:
+            mecanismo = (
+                "A demanda é relativamente menos elástica, então os consumidores "
+                "suportam uma parcela maior do imposto."
+            )
+        else:
+            mecanismo = (
+                "A oferta é relativamente menos elástica, então os produtores "
+                "suportam uma parcela maior do imposto."
+            )
+        finalidade = (
+            f" {mecanismo} Nos três cenários A, a soma das inclinações das "
+            "curvas inversas é mantida constante: a redução da quantidade "
+            "e o peso morto são iguais."
+        )
     elif experimento == "Experimento B":
-        finalidade = " O experimento B investiga como a sensibilidade dos agentes altera a redução de trocas."
+        finalidade = (
+            " Ao comparar os cenários B, vemos que elasticidades iniciais "
+            "maiores tornam a quantidade mais sensível ao mesmo imposto, "
+            "aumentando a redução das trocas e o peso morto."
+        )
     else:
         finalidade = " Os resultados decorrem das curvas e hipóteses que você definiu."
     return mudanca + incidencia + welfare + finalidade
@@ -159,13 +181,19 @@ with st.sidebar:
             cenarios = None
             destaque = None
         else:
-            st.caption("Os exemplos usam parâmetros hipotéticos da arquitetura v1.1.")
+            st.caption("Cenários hipotéticos de ensino.")
             if experiencia == "Experimento A":
-                st.info("Fixamos P₀=60, Q₀=40 e b+d=2. Variamos a relação entre as inclinações.")
+                st.info(
+                    "Mesmo equilíbrio inicial e mesmo imposto; comparamos "
+                    "como a carga tributária se distribui entre consumidores e produtores."
+                )
                 limite_imposto = 80.0
                 funcao_cenarios = cenarios_experimento_a
             else:
-                st.info("Fixamos P₀=60, Q₀=40 e b=d. Variamos a sensibilidade conjunta.")
+                st.info(
+                    "Mesmo equilíbrio inicial e mesmo imposto; comparamos "
+                    "como a sensibilidade ao preço altera as trocas."
+                )
                 limite_imposto = 40.0
                 funcao_cenarios = cenarios_experimento_b
             imposto = st.slider(
@@ -187,7 +215,7 @@ with st.sidebar:
 
     st.divider()
     st.caption("Modelo: equilíbrio parcial competitivo; curvas lineares; ausência de externalidades; imposto por unidade.")
-    st.caption("Projeto independente de Economia · versão visual 1.0")
+    st.caption("Projeto independente de Economia · interface v1.1 · arquitetura matemática v1.1")
 
 st.markdown("\n")
 aba_simulacao, aba_comparacao, aba_metodo = st.tabs(
@@ -198,21 +226,26 @@ with aba_simulacao:
     coluna_grafico, coluna_indicadores = st.columns([1.65, 1], gap="large")
     with coluna_grafico:
         st.subheader("Equilíbrio de mercado")
-        st.plotly_chart(grafico_mercado(resultado), use_container_width=True,
+        st.plotly_chart(grafico_mercado(resultado, cenarios), use_container_width=True,
                         config={"displaylogo": False, "responsive": True})
-        st.caption("Curvas e áreas representadas conforme o modelo. O retângulo indica arrecadação e o triângulo, perda de eficiência.")
+        if resultado["t"] == 0:
+            st.caption("Sem imposto: o gráfico mostra somente o equilíbrio inicial, sem áreas tributárias.")
+        elif resultado["ha_transacoes"]:
+            st.caption("A área lilás representa a arrecadação; a área laranja, o peso morto. Q₀ e Qₜ indicam as quantidades antes e depois do imposto.")
+        else:
+            st.caption("Sem transações: não há arrecadação nem preços efetivamente negociados. A área laranja representa toda a perda de excedente.")
     with coluna_indicadores:
         st.subheader("Indicadores")
         c1, c2 = st.columns(2)
-        c1.metric("Quantidade inicial", numero(resultado["q0"]))
-        c2.metric("Quantidade após imposto", numero(resultado["qt"]),
+        c1.metric("Quantidade antes", numero(resultado["q0"]))
+        c2.metric("Quantidade depois", numero(resultado["qt"]),
                   delta=f"{numero(-resultado['reducao_quantidade'])} un.", delta_color="off")
         c3, c4 = st.columns(2)
         c3.metric("Preço inicial", moeda(resultado["p0"]))
-        c4.metric("Preço ao consumidor", moeda(resultado["pc"]))
+        c4.metric("Preço consumidor", moeda(resultado["pc"]))
         c5, c6 = st.columns(2)
-        c5.metric("Preço ao produtor", moeda(resultado["pp"]))
-        c6.metric("Imposto por unidade", moeda(resultado["t"]))
+        c5.metric("Preço produtor", moeda(resultado["pp"]))
+        c6.metric("Imposto/unidade", moeda(resultado["t"]))
         if resultado["t"] == 0:
             st.caption("Sem tributação efetiva: não existe carga de imposto a distribuir.")
         elif not resultado["ha_transacoes"]:
@@ -238,7 +271,9 @@ with aba_simulacao:
         st.caption("O excedente total com imposto soma excedentes privados e arrecadação pública, uma única vez.")
     with cw2:
         st.markdown("#### O que aconteceu neste mercado?")
-        st.markdown(explicacao(resultado, experiencia))
+        # O cifrão deve ser escapado apenas no Markdown: sem isso,
+        # valores R$ podem ser interpretados como delimitadores de matemática.
+        st.markdown(explicacao(resultado, experiencia).replace("$", r"\$"))
         st.markdown(
             '<div class="lce-note">Estas conclusões dependem de concorrência perfeita, equilíbrio parcial, '
             'curvas lineares e das hipóteses monetárias usadas para interpretar o bem-estar. '
@@ -255,26 +290,64 @@ with aba_comparacao:
     else:
         if experiencia == "Experimento A":
             st.subheader("Experimento A · Quem suporta o imposto?")
-            st.markdown(
-                "Mantemos **P₀=60**, **Q₀=40**, **b+d=2** e o mesmo imposto. "
-                "A distribuição do imposto muda, mas a quantidade e o peso morto "
-                "permanecem iguais enquanto o equilíbrio é interior."
-            )
             if resultado["t"] == 0:
-                st.caption("Os percentuais no gráfico representam repasse **potencial**, pois o imposto é zero.")
+                st.markdown(
+                    "**O que observar:** sem imposto, ninguém paga tributo. "
+                    "As barras indicam apenas como um imposto pequeno *seria* dividido."
+                )
             elif not resultado["ha_transacoes"]:
-                st.warning("Com transações nulas, os percentuais do gráfico são coeficientes potenciais, não incidência efetiva.")
+                st.markdown(
+                    "**O que observar:** com todas as transações interrompidas, "
+                    "não há imposto efetivamente pago. As barras mostram apenas "
+                    "as proporções potenciais de repasse."
+                )
+            else:
+                st.markdown(
+                    "**O que observar:** a parcela do imposto paga por cada lado "
+                    "muda entre os cenários, mas a quantidade vendida e o peso "
+                    "morto permanecem iguais. **Quem paga** e **quanto se perde "
+                    "em eficiência** são questões diferentes."
+                )
+            with st.expander("Por que isso acontece? · Detalhes do experimento A"):
+                st.markdown(
+                    "Mantemos o preço inicial **P₀ = 60**, a quantidade inicial "
+                    "**Q₀ = 40** e a soma **b + d = 2**, usando o mesmo imposto. "
+                    "Nas curvas inversas, **b** é a inclinação em módulo da demanda "
+                    "e **d** é a inclinação da oferta. A soma constante faz com "
+                    "que a mesma variação do imposto produza a mesma redução "
+                    "da quantidade. A divisão potencial da carga é **b/(b+d)** "
+                    "para o consumidor e **d/(b+d)** para o produtor; essas parcelas "
+                    "são efetivas apenas com imposto positivo e transações."
+                )
             st.plotly_chart(grafico_reparticao(cenarios), use_container_width=True,
                             config={"displaylogo": False})
         else:
             st.subheader("Experimento B · Quanto o imposto distorce o mercado?")
-            st.markdown(
-                "Mantemos **P₀=60**, **Q₀=40**, **b=d** e o mesmo imposto. "
-                "Reduzir a elasticidade de oferta e demanda neste desenho controlado "
-                "diminui a queda da quantidade e o peso morto."
-            )
+            if resultado["t"] == 0:
+                st.markdown(
+                    "**O que observar:** sem imposto, não há perda de eficiência. "
+                    "As elasticidades dos três mercados são diferentes, "
+                    "mas nenhum deles sofre uma redução de transações."
+                )
+            else:
+                st.markdown(
+                    "**O que observar:** com o mesmo imposto, mercados mais "
+                    "sensíveis ao preço deixam de realizar mais transações e "
+                    "apresentam maior peso morto, **mesmo quando a divisão "
+                    "potencial do imposto é de 50% para cada lado**."
+                )
+            with st.expander("Por que isso acontece? · Detalhes do experimento B"):
+                st.markdown(
+                    "Mantemos **P₀ = 60**, **Q₀ = 40** e o mesmo imposto. "
+                    "Nas curvas inversas, fazemos **b = d**: isso garante "
+                    "uma divisão potencial de 50% para cada lado. Alteramos "
+                    "as duas inclinações conjuntamente, mudando a resposta da "
+                    "quantidade ao imposto. As elasticidades apresentadas na "
+                    "tabela são **pontuais no equilíbrio inicial** e não "
+                    "permanecem constantes ao longo das curvas."
+                )
             if any(not r["ha_transacoes"] for _, r in cenarios):
-                st.warning("Pelo menos um cenário chegou ao imposto proibitivo: nele não existem preços de transação.")
+                st.warning("Pelo menos um cenário chegou ao imposto proibitivo: nele não existem preços de transação nem repartição efetiva do tributo.")
             st.plotly_chart(grafico_distorcao(cenarios), use_container_width=True,
                             config={"displaylogo": False})
         tabela = []
@@ -283,6 +356,8 @@ with aba_comparacao:
                 "Cenário": nome,
                 "Q₀": numero(r["q0"]),
                 "Q após imposto": numero(r["qt"]),
+                "|ε demanda| (inicial)": numero(abs(r["elasticidade_demanda_0"]), 2),
+                "ε oferta (inicial)": numero(r["elasticidade_oferta_0"], 2),
                 "P consumidor": moeda(r["pc"]),
                 "P produtor": moeda(r["pp"]),
                 "Consumidor (repasse)*": percentual(r["fracao_consumidor_efetiva"]),
@@ -290,7 +365,7 @@ with aba_comparacao:
                 "Peso morto": moeda(r["peso_morto"]),
             })
         st.dataframe(tabela, use_container_width=True, hide_index=True)
-        st.caption("* Parcela efetiva por unidade em mercados com imposto positivo e transações. Um traço significa 'não aplicável'.")
+        st.caption("Elasticidades pontuais avaliadas no equilíbrio inicial (não constantes ao longo das curvas lineares). * Parcela efetiva por unidade somente com imposto positivo e transações; traço = não aplicável.")
         st.caption("Alterações nas curvas são experimentos teóricos controlados; não equivalem a estimativas empíricas de efeitos causais.")
 
 with aba_metodo:
@@ -337,4 +412,4 @@ with aba_metodo:
     )
 
 st.divider()
-st.caption("LCE · Laboratório de Cenários Econômicos — projeto acadêmico independente · Módulo 01, interface v1.0")
+st.caption("LCE · Laboratório de Cenários Econômicos — projeto acadêmico independente · Módulo 01, interface v1.1")

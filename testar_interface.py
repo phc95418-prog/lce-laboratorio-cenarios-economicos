@@ -76,6 +76,37 @@ class TestesInterface(unittest.TestCase):
         self.assertNotIn("Peso morto", nomes)
         self.assert_quase_igual(r["et0"], r["et"])
 
+    def test_escalas_comuns_nos_cenarios(self):
+        for gerador in (cenarios_experimento_a, cenarios_experimento_b):
+            resultados = resultados_cenarios(gerador(20))
+            graficos = [grafico_mercado(r, resultados) for _, r in resultados]
+            primeiro = graficos[0]
+            for outro in graficos[1:]:
+                self.assertEqual(list(primeiro.layout.xaxis.range), list(outro.layout.xaxis.range))
+                self.assertEqual(list(primeiro.layout.yaxis.range), list(outro.layout.yaxis.range))
+
+    def test_barras_comparativas_exibem_valores(self):
+        resultados = resultados_cenarios(cenarios_experimento_b(20))
+        fig = grafico_distorcao(resultados)
+        for serie in fig.data:
+            self.assertEqual(len(serie.text), 3)
+            self.assertEqual(serie.textposition, "inside")
+            self.assertEqual(serie.textfont.color, "#FFFFFF")
+
+    def test_grafico_distorcao_sem_imposto_explica_zeros(self):
+        resultados = resultados_cenarios(cenarios_experimento_b(0))
+        fig = grafico_distorcao(resultados)
+        self.assertEqual(len(fig.layout.annotations), 1)
+        self.assertIn("Sem arrecadação", fig.layout.annotations[0].text)
+        for serie in fig.data:
+            self.assertEqual(list(serie.text), ["", "", ""])
+
+    def test_escala_vertical_comporta_oferta_mais_imposto(self):
+        r = simular_mercado(100, 1, 20, 1, 20)
+        fig = grafico_mercado(r)
+        oferta_mais_imposto = next(tr for tr in fig.data if tr.name == "Oferta + imposto")
+        self.assertGreater(fig.layout.yaxis.range[1], max(oferta_mais_imposto.y))
+
     def test_graficos_comparativos(self):
         a = resultados_cenarios(cenarios_experimento_a(20))
         b = resultados_cenarios(cenarios_experimento_b(20))
