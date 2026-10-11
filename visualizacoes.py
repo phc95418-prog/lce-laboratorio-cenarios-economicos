@@ -4,6 +4,10 @@ As formulas P_D(Q), P_S(Q) aqui sao usadas apenas para desenhar curvas,
 nao para recalcular o equilibrio nem os indicadores economicos.
 """
 
+# Inicializa pandas antes do Plotly: em certas partidas do Streamlit Cloud,
+# Plotly pode encontrar pandas parcialmente carregado e falhar ao acessar
+# pandas.Series durante a validacao de go.Scatter.
+import pandas as pd  # dependencia ja instalada pelo Streamlit
 import plotly.graph_objects as go
 
 COR_DEMANDA = "#3268BB"
