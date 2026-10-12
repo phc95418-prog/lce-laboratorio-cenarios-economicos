@@ -216,7 +216,7 @@ with st.sidebar:
 
     st.divider()
     st.caption("Modelo: equilíbrio parcial competitivo; curvas lineares; ausência de externalidades; imposto por unidade.")
-    st.caption("Projeto independente de Economia · interface v1.2 (piloto local) · arquitetura matemática v1.1")
+    st.caption("Projeto independente de Economia · interface v1.2 · arquitetura matemática v1.1")
 
 st.markdown("\n")
 aba_simulacao, aba_comparacao, aba_metodo = st.tabs(
@@ -297,18 +297,30 @@ with aba_comparacao:
                 "o **mesmo imposto**. Explore como seus resultados se relacionam. "
                 "Você pode seguir uma questão sugerida ou comparar livremente."
             )
+            # Sempre renderizar UMA legenda neste ponto. Antes, ela era
+            # criada somente para imposto zero/proibitivo: sua inserção ou
+            # remoção deslocava os painéis seguintes e podia recolhê-los.
             if resultado["t"] == 0:
-                st.caption(
+                aviso_tributo = (
                     "Imposto zero: as barras representam repasses potenciais; "
                     "não há carga tributária efetivamente paga."
                 )
             elif not resultado["ha_transacoes"]:
-                st.caption(
+                aviso_tributo = (
                     "Sem transações: as barras representam repasses potenciais, "
                     "não pagamentos realizados."
                 )
+            else:
+                aviso_tributo = (
+                    "Com imposto positivo e transações, as barras mostram "
+                    "as parcelas do imposto suportadas por cada lado do mercado."
+                )
+            st.caption(aviso_tributo)
             # Roteiro opcional: nenhuma pergunta é obrigatória ou bloqueia a comparação.
-            with st.expander("💡 Questões para investigar · opcional", expanded=False):
+            with st.expander(
+                "💡 Questões para investigar · opcional", expanded=False,
+                key="lce_a_painel_questoes", on_change="rerun",
+            ):
                 st.caption("Escolha uma curiosidade para explorar. Não há respostas obrigatórias nem pontuação.")
                 questao_a = st.radio(
                     "O que você quer investigar?",
@@ -368,7 +380,10 @@ with aba_comparacao:
         st.caption("Elasticidades pontuais avaliadas no equilíbrio inicial (não constantes ao longo das curvas lineares). * Parcela efetiva por unidade somente com imposto positivo e transações; traço = não aplicável.")
         st.caption("Alterações nas curvas são experimentos teóricos controlados; não equivalem a estimativas empíricas de efeitos causais.")
         if experiencia == "Experimento A":
-            with st.expander("📖 Compreenda o mecanismo · opcional", expanded=False):
+            with st.expander(
+                "📖 Compreenda o mecanismo · opcional", expanded=False,
+                key="lce_a_painel_mecanismo", on_change="rerun",
+            ):
                 # A questão é a mesma selecionada acima; se o primeiro painel estiver
                 # fechado, a primeira questão serve somente como padrão navegável.
                 questao_a = st.session_state.get("lce_a_questao", "incidencia")
@@ -384,7 +399,10 @@ with aba_comparacao:
                 if notacao:
                     st.latex(notacao)
                 st.caption("As explicações descrevem o experimento teórico; não são previsões para um mercado real.")
-            with st.expander("Síntese econômica · após a comparação", expanded=False):
+            with st.expander(
+                "Síntese econômica · após a comparação", expanded=False,
+                key="lce_a_painel_sintese", on_change="rerun",
+            ):
                 questao_a = st.session_state.get("lce_a_questao", "incidencia")
                 st.markdown(sintese(questao_a, cenarios).replace("$", r"\$"))
                 st.caption("Síntese do modelo hipotético; consulte as hipóteses na aba Modelo e hipóteses.")
@@ -433,4 +451,4 @@ with aba_metodo:
     )
 
 st.divider()
-st.caption("LCE · Laboratório de Cenários Econômicos — projeto acadêmico independente · Módulo 01, interface v1.2 (piloto local)")
+st.caption("LCE · Laboratório de Cenários Econômicos — projeto acadêmico independente · Módulo 01, interface v1.2")

@@ -125,6 +125,60 @@ class TestesInvestigacaoA(unittest.TestCase):
         self.assertNotIn('**O que observar:** a parcela', trecho)
         self.assertIn('"Três mercados partem do **mesmo equilíbrio inicial**', trecho)
 
+    def test_leitura_grafica_separa_imposto_zero_de_sem_transacoes(self):
+        sem_imposto = explicacao("incidencia", "Leitura dos gráficos", self.cenarios[0])
+        sem_transacoes = explicacao("incidencia", "Leitura dos gráficos", self.cenarios[80])
+        self.assertIn("continuam realizando transações", sem_imposto)
+        self.assertIn("P₀ = R$ 60,00", sem_imposto)
+        self.assertIn("preços pagos e recebidos são válidos", sem_imposto)
+        self.assertIn("*potenciais*", sem_imposto)
+        self.assertIn("nenhuma unidade é comercializada", sem_transacoes)
+        self.assertIn("Não existem preços efetivos", sem_transacoes)
+        self.assertNotIn("preços pagos e recebidos são válidos", sem_transacoes)
+
+    def test_tres_expanders_investigacao_preservam_estado(self):
+        """Protege as opções da API Streamlit; interação visual requer navegador."""
+        import ast
+        from pathlib import Path
+
+        arvore = ast.parse(Path(__file__).with_name("app.py").read_text(encoding="utf-8"))
+        encontrados = {}
+        for no in ast.walk(arvore):
+            if not isinstance(no, ast.Call):
+                continue
+            if not (isinstance(no.func, ast.Attribute) and no.func.attr == "expander"
+                    and isinstance(no.func.value, ast.Name)
+                    and no.func.value.id == "st"):
+                continue
+            argumentos = {k.arg: k.value for k in no.keywords}
+            chave = argumentos.get("key")
+            if isinstance(chave, ast.Constant) and chave.value.startswith("lce_a_painel_"):
+                encontrados[chave.value] = argumentos
+        self.assertEqual(set(encontrados), {
+            "lce_a_painel_questoes", "lce_a_painel_mecanismo", "lce_a_painel_sintese"
+        })
+        for chave, kwargs in encontrados.items():
+            with self.subTest(painel=chave):
+                self.assertIsInstance(kwargs["on_change"], ast.Constant)
+                self.assertEqual(kwargs["on_change"].value, "rerun")
+
+    def test_legenda_antes_dos_paineis_nao_muda_estrutura_com_imposto_zero(self):
+        """Impede regressão que desloca os expanders ao passar por t=0."""
+        from pathlib import Path
+        codigo = Path(__file__).with_name("app.py").read_text(encoding="utf-8")
+        trecho = codigo.split('st.subheader("Experimento A · Quem suporta o imposto?")', 1)[1]
+        trecho = trecho.split('# Roteiro opcional:', 1)[0]
+        self.assertEqual(trecho.count('st.caption('), 1)
+        self.assertIn('st.caption(aviso_tributo)', trecho)
+        self.assertIn('if resultado["t"] == 0:', trecho)
+        self.assertIn('elif not resultado["ha_transacoes"]:', trecho)
+        self.assertIn('aviso_tributo = (', trecho)
+        self.assertIn('else:', trecho)
+
+    def test_questao_quantidade_nao_antecipa_conclusao(self):
+        self.assertIn("acompanha as mudanças", QUESTOES["quantidade"])
+        self.assertNotIn("permanecer igual", QUESTOES["quantidade"])
+
     def test_valida_questoes_e_niveis_invalidos(self):
         with self.assertRaises(ValueError):
             sugestao("inexistente", self.cenarios[20])

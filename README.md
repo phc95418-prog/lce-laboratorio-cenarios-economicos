@@ -1,7 +1,7 @@
 # LCE — Laboratório de Cenários Econômicos
 
 **Módulo 01 — Incidência tributária, elasticidades e bem-estar**  
-Interface v1.2 — **candidata à publicação, com investigação opcional no Experimento A**, construída sobre a Arquitetura Funcional e Matemática v1.1. A versão pública permanece na v1.1.
+Interface v1.2 — **publicada, com investigação opcional no Experimento A**, construída sobre a Arquitetura Funcional e Matemática v1.1.
 
 Projeto acadêmico independente de Pedro Henrique de Carvalho Almeida (Economia — IDP).
 
@@ -68,9 +68,9 @@ Os testes cobrem os exemplos de referência, cenários comparativos, identidades
 | `testar_interface.py` | Testes dos dados dos gráficos e dos cenários. |
 | `INICIAR_LCE.bat` | Atalho opcional de execução no Windows. |
 
-## Consolidação técnica da v1.2 (após inspeção visual)
+## Consolidação técnica da v1.2
 
-Esta candidata v1.2 foi consolidada após os testes locais do piloto. Recomenda-se fazer uma conferência rápida do pacote definitivo antes da atualização do GitHub. O núcleo matemático, os experimentos e os gráficos continuam idênticos ao piloto já testado.
+A v1.2 foi consolidada após testes locais e auditoria funcional da aplicação pública. O núcleo matemático, os experimentos e os gráficos continuam idênticos ao piloto já testado.
 
 - A comparação do Experimento A inicia com um convite neutro, sem antecipar a resposta.
 - O painel de questões aparece antes do gráfico; a interpretação e a síntese aparecem depois da tabela e são opcionais.
@@ -82,7 +82,7 @@ Se você já executa o piloto anterior, pode simplesmente substituir **app.py**,
 
 ## Recursos pedagógicos opcionais da v1.2
 
-**Antes do envio ao GitHub:** confirme no Streamlit local a síntese revisada das questões 1 e 3. A versão pública v1.1 permanece preservada até a atualização do repositório.
+A v1.2 está publicada. Antes de novas atualizações, verifique o comportamento em execução local e no ambiente público.
 
 Na aba **Comparar cenários** do **Experimento A**:
 
@@ -94,7 +94,7 @@ Na aba **Comparar cenários** do **Experimento A**:
 
 O núcleo econômico (`modelo_mercado.py`), os cenários (`experimentos.py`) e os gráficos (`visualizacoes.py`, incluindo a correção para pandas/Plotly) foram preservados. O piloto acrescenta apenas uma camada opcional à comparação A.
 
-**Status dos testes neste pacote:** 10 testes de modelo, 11 testes de interface/figuras e 13 testes pedagógicos, total de **34 testes aprovados** no ambiente de preparação. A nova revisão ainda precisa de inspeção visual local no Streamlit.
+**Verificações:** os testes de modelo, interface e investigação pedagógica são executáveis localmente. As correções dos painéis abertos precisam ainda de validação visual no Streamlit antes de considerar a manutenção concluída.
 
 ## Atualizações da interface v1.1
 
@@ -107,7 +107,7 @@ O núcleo econômico (`modelo_mercado.py`), os cenários (`experimentos.py`) e o
 - Texto do Experimento A ajustado para diferenciar o cenário simétrico dos casos de maior incidência em um dos lados.
 - Modelo e definição dos cenários preservados; testes originais e testes de regressão ampliados.
 
-## Publicar no Streamlit Community Cloud (após validação do piloto)
+## Publicação no Streamlit Community Cloud
 
 1. Criar no GitHub um repositório público, por exemplo `lce-laboratorio-cenarios-economicos`.
 2. Fazer upload dos **arquivos extraídos**, mantendo `app.py`, `modelo_mercado.py`, `experimentos.py`, `visualizacoes.py` e `requirements.txt` no nível principal do repositório. Não envie o arquivo ZIP como único conteúdo, nem a pasta `.venv`.
@@ -127,9 +127,24 @@ Documentação oficial: https://docs.streamlit.io/deploy/streamlit-community-clo
 Modelo estático de equilíbrio parcial competitivo, bem homogêneo, curvas lineares, preços tomados como dados por agentes e imposto por unidade comercializada. As métricas de bem-estar dependem de pressupostos adicionais, descritos na especificação acadêmica do Módulo 01. A incidência econômica é distinta da obrigação legal de recolhimento. O modelo não contempla efeitos-renda relevantes, externalidades, dinâmica, evasão, mercados com poder de mercado nem uso da receita pelo governo.
 
 
-## Ajustes da candidata final
+## Ajustes de manutenção da v1.2
 
 - A síntese de incidência utiliza **parcela percentual do imposto**, evitando confundir percentuais com valores monetários por unidade.
 - A síntese sobre aumento do imposto informa o valor atual da arrecadação e do peso morto e os relaciona à receita máxima no desenho controlado do Experimento A.
 - Foram acrescentados testes de regressão das sínteses (inclusive com imposto de R$ 60,00 e limite proibitivo).
 - A v1.2 continua restrita à comparação do Experimento A; sem alterações no núcleo econômico ou no Experimento B.
+
+### Revisão após auditoria pública
+
+- Os três painéis do Experimento A agora possuem chave de estado própria e atualização em eventos de abertura/fechamento (`st.expander`, `on_change="rerun"`), para manter o estado durante alterações no imposto.
+- A leitura gráfica da incidência diferencia imposto zero, com transações e preços válidos, de imposto proibitivo, sem transações e preços de negociação.
+- A questão sobre quantidade e incidência foi reformulada de maneira mais aberta.
+- A identificação de "piloto local" foi retirada da interface pública.
+
+Essas correções não alteram o núcleo matemático. A persistência visual dos painéis deve ser conferida na aplicação Streamlit após a atualização.
+
+### Correção de regressão — transição pelo imposto zero
+
+O último teste local identificou que os três painéis se recolhiam ao cruzar a fronteira entre imposto zero e imposto positivo. A interface criava uma mensagem adicional acima dos painéis somente nos casos-limite; isso alterava a estrutura dos elementos renderizados. Agora a posição da mensagem é renderizada incondicionalmente, mudando apenas seu texto. Foi incluído um teste estrutural de regressão.
+
+**Importante:** testes automatizados não comprovam o estado visual de painéis no navegador. Validar localmente as transições 20 → 0 → 30 e 20 → 42 → 1 → 0 → 1 → 54 antes de atualizar o GitHub.

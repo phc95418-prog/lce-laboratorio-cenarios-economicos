@@ -6,7 +6,7 @@ As três etapas (observação, explicação, síntese) não bloqueiam a simulaç
 
 QUESTOES = {
     "incidencia": "Por que consumidores e produtores suportam parcelas diferentes do imposto?",
-    "quantidade": "Como a quantidade pode permanecer igual quando a incidência muda?",
+    "quantidade": "A quantidade comercializada acompanha as mudanças na incidência?",
     "imposto": "O que acontece quando aumentamos o imposto?",
 }
 NIVEIS = ("Intuição", "Leitura dos gráficos", "Matemática")
@@ -92,11 +92,22 @@ def explicacao(questao, nivel, cenarios):
                     "cunha tributária. Na situação simétrica, o encargo é dividido "
                     "igualmente; quando as sensibilidades diferem, a divisão muda.")
         if nivel == "Leitura dos gráficos":
-            if estado != "interior":
-                return ("As barras representam coeficientes *potenciais* de repasse. "
-                        "Sem imposto ou sem transações não existe incidência efetiva: "
-                        "por isso os preços pós-imposto não devem ser tratados como "
-                        "pagamentos observados nesse ponto.")
+            if estado == "sem_imposto":
+                return (
+                    "Com **imposto zero**, os mercados continuam realizando transações "
+                    f"em Q₀ = {_numero(q0)} ao preço de equilíbrio P₀ = {_moeda(r['p0'])}. "
+                    "Os preços pagos e recebidos são válidos e iguais ao preço inicial. "
+                    "O que não existe é carga tributária efetivamente suportada; "
+                    "as barras indicam somente parcelas *potenciais* de repasse "
+                    "para um imposto positivo."
+                )
+            if estado == "sem_transacoes":
+                return (
+                    "Com **imposto proibitivo**, nenhuma unidade é comercializada. "
+                    "Não existem preços efetivos de compra e venda, nem arrecadação "
+                    "ou incidência tributária realizada. As barras representam "
+                    "apenas parcelas *potenciais* de repasse, não pagamentos observados."
+                )
             linhas = []
             for nome, cenario in cenarios:
                 subiu = cenario["pc"] - cenario["p0"]
