@@ -35,6 +35,15 @@ st.markdown("""
   div[data-testid="stMetric"] {border:1px solid rgba(128,145,167,0.22);
      border-radius:12px; padding:0.8rem 0.85rem; background:rgba(140,156,177,0.035);}
   div[data-testid="stMetricValue"] {font-size:1.55rem;}
+  /* Os cartões devem caber na área disponível, inclusive com a lateral aberta. */
+  .st-key-lce_indicadores [data-testid="stColumn"] {
+     min-width:min(100%, 9.5rem);}
+  .st-key-lce_bem_estar [data-testid="stColumn"] {
+     min-width:min(100%, 12rem);}
+  :is(.st-key-lce_indicadores, .st-key-lce_bem_estar)
+     [data-testid="stMetricLabel"] [data-testid="stMarkdownContainer"],
+  :is(.st-key-lce_indicadores, .st-key-lce_bem_estar)
+     [data-testid="stMetricLabel"] p {white-space:normal;}
   div[data-testid="stTabs"] {margin-top:0.4rem;}
 </style>
 """, unsafe_allow_html=True)
@@ -237,16 +246,17 @@ with aba_simulacao:
             st.caption("Sem transações: não há arrecadação nem preços efetivamente negociados. A área laranja representa toda a perda de excedente.")
     with coluna_indicadores:
         st.subheader("Indicadores")
-        c1, c2 = st.columns(2)
-        c1.metric("Quantidade antes", numero(resultado["q0"]))
-        c2.metric("Quantidade depois", numero(resultado["qt"]),
-                  delta=f"{numero(-resultado['reducao_quantidade'])} un.", delta_color="off")
-        c3, c4 = st.columns(2)
-        c3.metric("Preço inicial", moeda(resultado["p0"]))
-        c4.metric("Preço consumidor", moeda(resultado["pc"]))
-        c5, c6 = st.columns(2)
-        c5.metric("Preço produtor", moeda(resultado["pp"]))
-        c6.metric("Imposto/unidade", moeda(resultado["t"]))
+        with st.container(key="lce_indicadores"):
+            c1, c2 = st.columns(2)
+            c1.metric("Quantidade antes", numero(resultado["q0"]))
+            c2.metric("Quantidade depois", numero(resultado["qt"]),
+                      delta=f"{numero(-resultado['reducao_quantidade'])} un.", delta_color="off")
+            c3, c4 = st.columns(2)
+            c3.metric("Preço inicial", moeda(resultado["p0"]))
+            c4.metric("Preço consumidor", moeda(resultado["pc"]))
+            c5, c6 = st.columns(2)
+            c5.metric("Preço produtor", moeda(resultado["pp"]))
+            c6.metric("Imposto/unidade", moeda(resultado["t"]))
         if resultado["t"] == 0:
             st.caption("Sem tributação efetiva: não existe carga de imposto a distribuir.")
         elif not resultado["ha_transacoes"]:
@@ -259,11 +269,12 @@ with aba_simulacao:
             )
 
     st.markdown("### Arrecadação e bem-estar")
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Arrecadação", moeda(resultado["arrecadacao"]))
-    m2.metric("Peso morto", moeda(resultado["peso_morto"]))
-    m3.metric("Excedente do consumidor", moeda(resultado["ec"]))
-    m4.metric("Excedente do produtor", moeda(resultado["ep"]))
+    with st.container(key="lce_bem_estar"):
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Arrecadação", moeda(resultado["arrecadacao"]))
+        m2.metric("Peso morto", moeda(resultado["peso_morto"]))
+        m3.metric("Excedente do consumidor", moeda(resultado["ec"]))
+        m4.metric("Excedente do produtor", moeda(resultado["ep"]))
 
     cw1, cw2 = st.columns([1, 1.15], gap="large")
     with cw1:
