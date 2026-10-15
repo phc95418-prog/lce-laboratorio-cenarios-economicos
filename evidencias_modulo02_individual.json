@@ -1,0 +1,683 @@
+{
+  "etapa": 2,
+  "data": "2026-10-14",
+  "branch": "feature/modulo-02",
+  "origem": "18cf392492b314e05b6c88f87495606591c791d3",
+  "url": "http://localhost:8503",
+  "ambiente": {
+    "python": "3.13.16 (.venv)",
+    "streamlit": "1.65.0",
+    "browser": "Codex In-app Browser"
+  },
+  "testes": {
+    "testar_modulo02_individual": 30,
+    "testar_modulo02_controles_js": 8,
+    "testar_modulo02_modelo": 37,
+    "testar_modelo": 10,
+    "testar_interface": 11,
+    "testar_investigacao": 20,
+    "total": 116,
+    "aprovados": 116,
+    "falhas": 0,
+    "erros": 0,
+    "ignorados": 0
+  },
+  "matriz": [
+    {
+      "ids": "EV-01",
+      "esperado": "Q25, padrões, totais/geral, ótimos ocultos, explicações fechadas",
+      "observado": "Renderização inicial e recarga nos padrões",
+      "resultado": "PASSOU",
+      "metodo": "navegador e testes de estado"
+    },
+    {
+      "ids": "AT-02/AT-15",
+      "esperado": "80/3 distinto de26,67; b1,1537; Enter/blur; inválidos preservam cálculo",
+      "observado": "Campo ótimo26,666666666666668; manual26,67; diferença marginal−0,01; b1,1537 preservado",
+      "resultado": "PASSOU",
+      "metodo": "navegador, Python e JS"
+    },
+    {
+      "ids": "AT-03/V03",
+      "esperado": "Q75 RMg−50 CMg95; negativos visíveis",
+      "observado": "Indicadores−50/95/−145 e curva abaixo de zero",
+      "resultado": "PASSOU",
+      "metodo": "navegador e geometria automatizada"
+    },
+    {
+      "ids": "V02/AT-04/C2",
+      "esperado": "CF1600: Qótimo80/3 e lucro−1600/3, sem fechamento",
+      "observado": "Q26,666666666666668; lucro−533,33 exibido",
+      "resultado": "PASSOU",
+      "metodo": "navegador e testes"
+    },
+    {
+      "ids": "AT-05/C3",
+      "esperado": "Q0,Qmax,a=c,a<c sem interpretações fictícias",
+      "observado": "Intercepto distinto de preço; fronteira de igualdade distinta de ausência de interseção",
+      "resultado": "PASSOU",
+      "metodo": "navegador e testes"
+    },
+    {
+      "ids": "V04/EV-02",
+      "esperado": "80→30 por domínio, ampliação não restaura80",
+      "observado": "Q30 preservado após a100,b1",
+      "resultado": "PASSOU",
+      "metodo": "navegador e testes"
+    },
+    {
+      "ids": "EV-03/EV-07",
+      "esperado": "Perspectiva/foco/ótimos não arredondamQ; comando escolhe ótimo exato",
+      "observado": "Campo80/3 conservado; marcadores e guias pertinentes",
+      "resultado": "PASSOU",
+      "metodo": "navegador e geometria automatizada"
+    },
+    {
+      "ids": "AT-12/EV-15/AT-17",
+      "esperado": "Valores/gráfico antes de soltar; síntese no fim",
+      "observado": "Arraste real com8valores; prova com ponteiro mantido: Q20,1, síntese acima conservada e depois abaixo",
+      "resultado": "PASSOU",
+      "metodo": "gesto real, captura durante ponteiro pressionado, sequências de eventos e testes"
+    },
+    {
+      "ids": "AT-11 larguras",
+      "esperado": "1280/1024/768 sem cortes ou rolagem horizontal",
+      "observado": "Cartões em5,4+1,3+2; medições sem overflow",
+      "resultado": "PASSOU",
+      "metodo": "navegador: medidasDOM e capturas"
+    },
+    {
+      "ids": "AT-11 teclado/contraste",
+      "esperado": "Controles nomeados, foco visível, teclado, dados fora dehover",
+      "observado": "ArrowRight, Enter e Tab exercitados; legendas por nome/estilo; contraste texto12,53 e curvas>=5,47 no tema claro",
+      "resultado": "PASSOU",
+      "metodo": "navegador e medidas de cor; escopo parcial de acessibilidade"
+    },
+    {
+      "ids": "AT-11 zoom200%",
+      "esperado": "Zoom real200%",
+      "observado": "Comando disponível não alterou largura CSS/DPR; API sem controle de zoom",
+      "resultado": "BLOQUEADO"
+    },
+    {
+      "ids": "AT-11 toque",
+      "esperado": "Interação por toque real",
+      "observado": "API disponível fornece mouse/teclado; sem recurso de toque ou dispositivo físico",
+      "resultado": "BLOQUEADO"
+    }
+  ],
+  "observacoes": [
+    {
+      "caso": "AT-02 ótimo",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n26,67",
+          "Preço da demanda (u.m./unidade)\n\n73,33",
+          "Receita total (u.m.)\n\n1.955,56",
+          "Custo total (u.m.)\n\n888,89",
+          "Lucro (u.m.)\n\n1.066,67"
+        ],
+        "sintese": "Esta quantidade maximiza o lucro nas condições do modelo."
+      }
+    },
+    {
+      "caso": "AT-02 manual 26,67",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n26,67",
+          "Preço da demanda (u.m./unidade)\n\n73,33",
+          "Receita marginal (u.m./unidade)\n\n46,66",
+          "Custo marginal (u.m./unidade)\n\n46,67",
+          "RMg − CMg (u.m./unidade)\n\n-0,01"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      }
+    },
+    {
+      "caso": "AT-03 Q75",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n75,00",
+          "Preço da demanda (u.m./unidade)\n\n25,00",
+          "Receita marginal (u.m./unidade)\n\n-50,00",
+          "Custo marginal (u.m./unidade)\n\n95,00",
+          "RMg − CMg (u.m./unidade)\n\n-145,00"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      }
+    },
+    {
+      "caso": "AT-15 incompleto rejeitado",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n75,00",
+          "Preço da demanda (u.m./unidade)\n\n25,00",
+          "Receita marginal (u.m./unidade)\n\n-50,00",
+          "Custo marginal (u.m./unidade)\n\n95,00",
+          "RMg − CMg (u.m./unidade)\n\n-145,00"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      }
+    },
+    {
+      "caso": "AT-15 b=1,1537 por perda de foco",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n75,00",
+          "Preço da demanda (u.m./unidade)\n\n13,47",
+          "Receita marginal (u.m./unidade)\n\n-73,05",
+          "Custo marginal (u.m./unidade)\n\n95,00",
+          "RMg − CMg (u.m./unidade)\n\n-168,05"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      },
+      "campo": "1,1537"
+    },
+    {
+      "caso": "AT-15 a175 rejeitado",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n75,00",
+          "Preço da demanda (u.m./unidade)\n\n13,47",
+          "Receita marginal (u.m./unidade)\n\n-73,05",
+          "Custo marginal (u.m./unidade)\n\n95,00",
+          "RMg − CMg (u.m./unidade)\n\n-168,05"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      }
+    },
+    {
+      "caso": "AT-04 CF1600 sem fechamento",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n26,67",
+          "Preço da demanda (u.m./unidade)\n\n73,33",
+          "Receita total (u.m.)\n\n1.955,56",
+          "Custo total (u.m.)\n\n2.488,89",
+          "Lucro (u.m.)\n\n-533,33"
+        ],
+        "sintese": "Esta quantidade maximiza o lucro nas condições do modelo. O custo fixo aumentou e reduziu o lucro, sem alterar a quantidade ótima, as receitas ou as grandezas marginais."
+      }
+    },
+    {
+      "caso": "AT-05 Q0 CF1600",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n0,00",
+          "Preço da demanda (u.m./unidade)\n\n100,00",
+          "Receita total (u.m.)\n\n0,00",
+          "Custo total (u.m.)\n\n1.600,00",
+          "Lucro (u.m.)\n\n-1.600,00"
+        ],
+        "sintese": "A quantidade escolhida está abaixo da que maximiza o lucro."
+      }
+    },
+    {
+      "caso": "AT-05 Qmax",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n100,00",
+          "Preço da demanda (u.m./unidade)\n\n0,00",
+          "Receita total (u.m.)\n\n0,00",
+          "Custo total (u.m.)\n\n8.600,00",
+          "Lucro (u.m.)\n\n-8.600,00"
+        ],
+        "sintese": "A quantidade escolhida está acima da que maximiza o lucro."
+      }
+    },
+    {
+      "caso": "C3 a=c fronteira",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n0,00",
+          "Preço da demanda (u.m./unidade)\n\n100,00",
+          "Receita marginal (u.m./unidade)\n\n100,00",
+          "Custo marginal (u.m./unidade)\n\n100,00",
+          "RMg − CMg (u.m./unidade)\n\n0,00"
+        ],
+        "sintese": "RMg(0)=CMg(0): igualdade na fronteira, sem ótimo interior ou transação."
+      }
+    },
+    {
+      "caso": "C3 a<c sem interseção",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n0,00",
+          "Preço da demanda (u.m./unidade)\n\n100,00",
+          "Receita marginal (u.m./unidade)\n\n100,00",
+          "Custo marginal (u.m./unidade)\n\n120,00",
+          "RMg − CMg (u.m./unidade)\n\n-20,00"
+        ],
+        "sintese": "Na origem, RMg(0)<CMg(0); o máximo de lucro está na fronteira Q=0."
+      }
+    },
+    {
+      "caso": "V04 clamp Q80 para30",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n30,00",
+          "Preço da demanda (u.m./unidade)\n\n0,00",
+          "Receita marginal (u.m./unidade)\n\n-60,00",
+          "Custo marginal (u.m./unidade)\n\n50,00",
+          "RMg − CMg (u.m./unidade)\n\n-110,00"
+        ],
+        "sintese": "A quantidade está no limite superior do domínio; uma expansão além dele não é admissível."
+      }
+    },
+    {
+      "caso": "V04 expansão preserva30",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n30,00",
+          "Preço da demanda (u.m./unidade)\n\n70,00",
+          "Receita marginal (u.m./unidade)\n\n40,00",
+          "Custo marginal (u.m./unidade)\n\n50,00",
+          "RMg − CMg (u.m./unidade)\n\n-10,00"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      }
+    },
+    {
+      "caso": "AT-17 ponteiro pressionado: gráfico atualizado, síntese consolidada só depois",
+      "durante": {
+        "metricas": [
+          "Quantidade (unidades)\n\n20,10",
+          "Preço da demanda (u.m./unidade)\n\n79,90",
+          "Receita total (u.m.)\n\n1.605,99",
+          "Custo total (u.m.)\n\n604,00",
+          "Lucro (u.m.)\n\n1.001,99"
+        ],
+        "sintese": "A quantidade escolhida está acima da que maximiza o lucro."
+      },
+      "eventos": {
+        "confirmadoServidor": "20.1",
+        "eventos": "[{\"fase\":\"servidor\",\"valor\":25,\"pressionado\":false,\"seq\":0},{\"fase\":\"live\",\"valor\":31.9,\"pressionado\":true,\"seq\":0},{\"fase\":\"live\",\"valor\":38.7,\"pressionado\":true,\"seq\":1},{\"fase\":\"live\",\"valor\":45.6,\"pressionado\":true,\"seq\":2},{\"fase\":\"live\",\"valor\":52.5,\"pressionado\":true,\"seq\":3},{\"fase\":\"live\",\"valor\":59.3,\"pressionado\":true,\"seq\":4},{\"fase\":\"live\",\"valor\":66.2,\"pressionado\":true,\"seq\":5},{\"fase\":\"live\",\"valor\":72.9,\"pressionado\":true,\"seq\":6},{\"fase\":\"live\",\"valor\":79.8,\"pressionado\":true,\"seq\":7},{\"fase\":\"fim\",\"valor\":79.8,\"pressionado\":false,\"seq\":8},{\"fase\":\"servidor\",\"valor\":79.8,\"pressionado\":false,\"seq\":9},{\"fase\":\"live\",\"valor\":50.2,\"pressionado\":true,\"seq\":9},{\"fase\":\"servidor\",\"valor\":50.2,\"pressionado\":true,\"seq\":10},{\"fase\":\"fim\",\"valor\":50.2,\"pressionado\":false,\"seq\":10},{\"fase\":\"servidor\",\"valor\":50.2,\"pressionado\":false,\"seq\":11},{\"fase\":\"live\",\"valor\":20.1,\"pressionado\":true,\"seq\":11},{\"fase\":\"servidor\",\"valor\":20.1,\"pressionado\":true,\"seq\":12}]",
+        "value": "20.1"
+      },
+      "final": {
+        "metricas": [
+          "Quantidade (unidades)\n\n20,10",
+          "Preço da demanda (u.m./unidade)\n\n79,90",
+          "Receita total (u.m.)\n\n1.605,99",
+          "Custo total (u.m.)\n\n604,00",
+          "Lucro (u.m.)\n\n1.001,99"
+        ],
+        "sintese": "A quantidade escolhida está abaixo da que maximiza o lucro."
+      }
+    },
+    {
+      "caso": "teclado slider ArrowRight",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n20,20",
+          "Preço da demanda (u.m./unidade)\n\n79,80",
+          "Receita total (u.m.)\n\n1.611,96",
+          "Custo total (u.m.)\n\n608,02",
+          "Lucro (u.m.)\n\n1.003,94"
+        ],
+        "sintese": "A quantidade escolhida está abaixo da que maximiza o lucro."
+      },
+      "foco": {
+        "height": 44,
+        "outline": "rgb(20, 93, 160) solid 3px",
+        "width": 623.46875
+      }
+    },
+    {
+      "caso": "AT-02 versão final ótimo",
+      "campo": "26,666666666666668",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n26,67",
+          "Preço da demanda (u.m./unidade)\n\n73,33",
+          "Receita total (u.m.)\n\n1.955,56",
+          "Custo total (u.m.)\n\n888,89",
+          "Lucro (u.m.)\n\n1.066,67"
+        ],
+        "sintese": "Esta quantidade maximiza o lucro nas condições do modelo."
+      }
+    },
+    {
+      "caso": "FINAL AT-02/15",
+      "otimo": "26,666666666666668",
+      "b": "1,1537",
+      "invalido": {
+        "metricas": [
+          "Quantidade (unidades)\n\n26,67",
+          "Preço da demanda (u.m./unidade)\n\n69,23",
+          "Receita total (u.m.)\n\n1.846,39",
+          "Custo total (u.m.)\n\n889,04",
+          "Lucro (u.m.)\n\n957,34"
+        ],
+        "sintese": "A quantidade escolhida está acima da que maximiza o lucro."
+      }
+    },
+    {
+      "caso": "FINAL C2/AT04 CF1600",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n26,67",
+          "Preço da demanda (u.m./unidade)\n\n73,33",
+          "Receita total (u.m.)\n\n1.955,56",
+          "Custo total (u.m.)\n\n2.488,89",
+          "Lucro (u.m.)\n\n-533,33"
+        ],
+        "sintese": "Esta quantidade maximiza o lucro nas condições do modelo. O custo fixo aumentou e reduziu o lucro, sem alterar a quantidade ótima, as receitas ou as grandezas marginais."
+      }
+    },
+    {
+      "caso": "FINAL AT05 Q0",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n0,00",
+          "Preço da demanda (u.m./unidade)\n\n100,00",
+          "Receita total (u.m.)\n\n0,00",
+          "Custo total (u.m.)\n\n1.600,00",
+          "Lucro (u.m.)\n\n-1.600,00"
+        ],
+        "sintese": "A quantidade escolhida está abaixo da que maximiza o lucro."
+      }
+    },
+    {
+      "caso": "FINAL C3 a=c",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n0,00",
+          "Preço da demanda (u.m./unidade)\n\n100,00",
+          "Receita marginal (u.m./unidade)\n\n100,00",
+          "Custo marginal (u.m./unidade)\n\n100,00",
+          "RMg − CMg (u.m./unidade)\n\n0,00"
+        ],
+        "sintese": "RMg(0)=CMg(0): igualdade na fronteira, sem ótimo interior ou transação."
+      }
+    },
+    {
+      "caso": "FINAL C3 a<c",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n0,00",
+          "Preço da demanda (u.m./unidade)\n\n100,00",
+          "Receita marginal (u.m./unidade)\n\n100,00",
+          "Custo marginal (u.m./unidade)\n\n120,00",
+          "RMg − CMg (u.m./unidade)\n\n-20,00"
+        ],
+        "sintese": "Na origem, RMg(0)<CMg(0); o máximo de lucro está na fronteira Q=0."
+      }
+    },
+    {
+      "caso": "FINAL V04 clamp e expansão",
+      "clamp": {
+        "metricas": [
+          "Quantidade (unidades)\n\n30,00",
+          "Preço da demanda (u.m./unidade)\n\n0,00",
+          "Receita marginal (u.m./unidade)\n\n-60,00",
+          "Custo marginal (u.m./unidade)\n\n50,00",
+          "RMg − CMg (u.m./unidade)\n\n-110,00"
+        ],
+        "sintese": "A quantidade está no limite superior do domínio; uma expansão além dele não é admissível."
+      },
+      "expandido": {
+        "metricas": [
+          "Quantidade (unidades)\n\n30,00",
+          "Preço da demanda (u.m./unidade)\n\n70,00",
+          "Receita marginal (u.m./unidade)\n\n40,00",
+          "Custo marginal (u.m./unidade)\n\n50,00",
+          "RMg − CMg (u.m./unidade)\n\n-10,00"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      }
+    },
+    {
+      "caso": "FINAL AT03 e nível Matemática acessível",
+      "observado": {
+        "metricas": [
+          "Quantidade (unidades)\n\n75,00",
+          "Preço da demanda (u.m./unidade)\n\n25,00",
+          "Receita marginal (u.m./unidade)\n\n-50,00",
+          "Custo marginal (u.m./unidade)\n\n95,00",
+          "RMg − CMg (u.m./unidade)\n\n-145,00"
+        ],
+        "sintese": "Neste ponto, um pequeno aumento da produção tende a reduzir o lucro."
+      }
+    }
+  ],
+  "medidas": [
+    {
+      "cartoes": [
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Quantidade (unidades)\n\n25,00",
+          "w": 200,
+          "x": 80,
+          "y": 656.625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Preço da demanda (u.m./unidade)\n\n75,00",
+          "w": 200,
+          "x": 296,
+          "y": 656.625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Receita total (u.m.)\n\n1.875,00",
+          "w": 200,
+          "x": 512,
+          "y": 656.625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Custo total (u.m.)\n\n812,50",
+          "w": 200,
+          "x": 728,
+          "y": 656.625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Lucro (u.m.)\n\n1.062,50",
+          "w": 200,
+          "x": 80,
+          "y": 779.421875
+        }
+      ],
+      "largura": 1024,
+      "overflow": false,
+      "pontos": [
+        "translate(188,119.21)",
+        "translate(188,139.49)",
+        "translate(188,134.72)"
+      ],
+      "rotulos": [
+        {
+          "cortado": false,
+          "texto": "Quantidade (unidades)"
+        },
+        {
+          "cortado": false,
+          "texto": "Preço da demanda (u.m./unidade)"
+        },
+        {
+          "cortado": false,
+          "texto": "Receita total (u.m.)"
+        },
+        {
+          "cortado": false,
+          "texto": "Custo total (u.m.)"
+        },
+        {
+          "cortado": false,
+          "texto": "Lucro (u.m.)"
+        }
+      ]
+    },
+    {
+      "cartoes": [
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Quantidade (unidades)\n\n25,00",
+          "w": 200,
+          "x": 16,
+          "y": 634.625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Preço da demanda (u.m./unidade)\n\n75,00",
+          "w": 200,
+          "x": 232,
+          "y": 634.625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Receita total (u.m.)\n\n1.875,00",
+          "w": 200,
+          "x": 448,
+          "y": 634.625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Custo total (u.m.)\n\n812,50",
+          "w": 200,
+          "x": 16,
+          "y": 757.421875
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Lucro (u.m.)\n\n1.062,50",
+          "w": 200,
+          "x": 232,
+          "y": 757.421875
+        }
+      ],
+      "largura": 768,
+      "overflow": false,
+      "pontos": [
+        "translate(156,119.21)",
+        "translate(156,139.49)",
+        "translate(156,134.72)"
+      ],
+      "rotulos": [
+        {
+          "cortado": false,
+          "texto": "Quantidade (unidades)"
+        },
+        {
+          "cortado": false,
+          "texto": "Preço da demanda (u.m./unidade)"
+        },
+        {
+          "cortado": false,
+          "texto": "Receita total (u.m.)"
+        },
+        {
+          "cortado": false,
+          "texto": "Custo total (u.m.)"
+        },
+        {
+          "cortado": false,
+          "texto": "Lucro (u.m.)"
+        }
+      ]
+    },
+    {
+      "cartoes": [
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Quantidade (unidades)\n\n75,00",
+          "w": 200,
+          "x": 80,
+          "y": 313.640625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Preço da demanda (u.m./unidade)\n\n25,00",
+          "w": 200,
+          "x": 296,
+          "y": 313.640625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Receita marginal (u.m./unidade)\n\n-50,00",
+          "w": 200,
+          "x": 512,
+          "y": 313.640625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "Custo marginal (u.m./unidade)\n\n95,00",
+          "w": 200,
+          "x": 728,
+          "y": 313.640625
+        },
+        {
+          "h": 106.796875,
+          "overflow": false,
+          "texto": "RMg − CMg (u.m./unidade)\n\n-145,00",
+          "w": 200,
+          "x": 944,
+          "y": 313.640625
+        }
+      ],
+      "largura": 1280,
+      "overflow": false,
+      "pontos": [
+        "translate(760.5,227.88)",
+        "translate(760.5,51.75)"
+      ],
+      "rotulos": [
+        {
+          "cortado": false,
+          "texto": "Quantidade (unidades)"
+        },
+        {
+          "cortado": false,
+          "texto": "Preço da demanda (u.m./unidade)"
+        },
+        {
+          "cortado": false,
+          "texto": "Receita marginal (u.m./unidade)"
+        },
+        {
+          "cortado": false,
+          "texto": "Custo marginal (u.m./unidade)"
+        },
+        {
+          "cortado": false,
+          "texto": "RMg − CMg (u.m./unidade)"
+        }
+      ]
+    }
+  ],
+  "corrigidos": [
+    "Objetos antigos após hot reload: reconstituição de contratos na camada de estado.",
+    "Callbacks com referência antiga: consulta ao objeto canônico e preservação de identidade nos reruns."
+  ],
+  "limitacoes": [
+    "Sem auditoria completa WCAG/leitor de tela; não declarar certificação AA.",
+    "Capturas do navegador apresentaram nitidez variável; medidas e conteúdo DOM são evidência complementar.",
+    "ECO-v0.2 e ARQ-v0.3 não acessíveis; usada v0.4 DOCX aprovada e contratos autorizados.",
+    "Sem comparação A, Experimento B ou navegação integrada."
+  ],
+  "capturas": [
+    "lce-etapa2-inicial.jpg",
+    "lce-etapa2-durante-arraste.jpg",
+    "lce-etapa2-marginal75.jpg",
+    "lce-etapa2-1280.jpg",
+    "lce-etapa2-1024.jpg",
+    "lce-etapa2-768.jpg"
+  ],
+  "local_capturas": "Fora do repositório, na pasta de visualizações desta sessão."
+}

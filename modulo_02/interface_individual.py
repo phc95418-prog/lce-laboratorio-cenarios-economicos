@@ -1,0 +1,121 @@
+"""Renderização de A individual. Executar pelo ponto de entrada lce_modulo02.py."""
+
+from pathlib import Path
+import streamlit as st
+
+from .estado_individual import (
+    EstadoIndividual, FOCOS, LIMITES, PERSPECTIVAS, aplicar_evento, selecionar_otimo,
+    selecionar_vista, revalidar_sessao,
+)
+from .explicacoes_individual import IDEIAS, condicoes_excepcionais, explicacao, numero, sintese
+from .graficos_individual import grafico_individual
+from .modelo_firma import avaliar_firma
+
+PASTA = Path(__file__).parent
+# Registro único durante a importação, sem redefinir componente a cada rerun.
+CONTROLE = st.components.v2.component(
+    "lce_m02_numero",
+    js=PASTA.joinpath("controles_individual.js").read_text(encoding="utf-8"),
+    css=PASTA.joinpath("controles_individual.css").read_text(encoding="utf-8"),
+)
+
+
+def controle(estado, campo, rotulo):
+    p = estado.escolha.parametros
+    minimo, maximo, passo = (0, p.q_max, 0.1) if campo == "q" else LIMITES[campo]
+    chave = f"m02_a_controle_{campo}"
+
+    def receber():
+        retorno = st.session_state.get(chave)
+        atual = revalidar_sessao(st.session_state.m02_a_individual)
+        aplicar_evento(atual, campo, retorno.get("evento") if retorno else None)
+        st.session_state.m02_a_individual = atual
+
+    CONTROLE(
+        key=chave, on_evento_change=receber,
+        data={"campo":campo, "rotulo":rotulo, "minimo":minimo, "maximo":maximo,
+              "passo":passo, "valor":estado.escolha.q if campo == "q" else getattr(p,campo),
+              "seq":estado.sequencias.get(campo,0), "erro":estado.erros.get(campo,"")},
+    )
+
+
+def renderizar_individual():
+    if "m02_a_individual" not in st.session_state:
+        st.session_state.m02_a_individual = EstadoIndividual()
+    estado = revalidar_sessao(st.session_state.m02_a_individual)
+    st.session_state.m02_a_individual = estado
+    st.caption("LABORATÓRIO DE CENÁRIOS ECONÔMICOS · MÓDULO 02")
+    st.title("Decisão de produção da firma")
+    st.write("Experimento A · Investigação individual")
+    st.caption("Modelo teórico linear-quadrático de uma firma monopolista. Valores monetários em unidades hipotéticas (u.m.).")
+
+    # Escopo local deste ponto de entrada, sem alterar o Módulo 01.
+    st.html("""<style>
+    .st-key-m02_a_root [data-testid="stCaptionContainer"] {opacity:1;}
+    .st-key-m02_a_indicadores [data-testid="stMetric"] {
+      max-width:100%;border:1px solid #8290a0;
+      border-radius:10px;padding:0.75rem;}
+    .st-key-m02_a_indicadores [data-testid="stMetricLabel"] p {white-space:normal;}
+    .st-key-m02_a_indicadores [data-testid="stMetricLabel"] {min-height:2.8rem;}
+    .st-key-m02_a_indicadores [data-testid="stMetricValue"] {font-size:1.5rem;white-space:normal;}
+    </style>""")
+
+    with st.expander("Parâmetros de demanda", key="m02_a_demanda", on_change="rerun"):
+        controle(estado,"a","a · intercepto da demanda (u.m./unidade)")
+        controle(estado,"b","b · inclinação da demanda")
+    with st.expander("Parâmetros de custos", key="m02_a_custos", on_change="rerun"):
+        controle(estado,"c","c · custo marginal inicial (u.m./unidade)")
+        controle(estado,"s","s · inclinação do custo marginal")
+        controle(estado,"cf","CF · custo fixo inevitável (u.m.)")
+
+    def mudar_vista():
+        selecionar_vista(st.session_state.m02_a_individual, st.session_state.m02_a_perspectiva)
+
+    st.radio("Perspectiva", PERSPECTIVAS, horizontal=True, key="m02_a_perspectiva", on_change=mudar_vista)
+    if estado.perspectiva == PERSPECTIVAS[0]:
+        def mudar_foco():
+            atual = st.session_state.m02_a_individual
+            selecionar_vista(atual, atual.perspectiva, st.session_state.m02_a_foco)
+        st.radio("Foco do gráfico", FOCOS, horizontal=True, key="m02_a_foco", on_change=mudar_foco,
+                 index=FOCOS.index(estado.foco))
+
+    st.plotly_chart(grafico_individual(estado), key="m02_a_grafico", width="stretch",
+                    config={"displayModeBar":False,"responsive":True,"locale":"pt-BR"})
+    st.caption("Linhas identificadas por nomes e estilos; os círculos indicam a quantidade escolhida. Os valores correspondentes estão abaixo, sem depender de hover.")
+    controle(estado,"q","Quantidade produzida Q (unidades)")
+    st.caption(f"Domínio atual: 0 ≤ Q ≤ {numero(estado.escolha.parametros.q_max)}. Enter ou perda de foco confirma o campo; a precisão digitada é preservada.")
+    with st.container(horizontal=True):
+        def mudar_otimos():
+            st.session_state.m02_a_individual.mostrar_otimos = st.session_state.m02_a_otimos
+        def ir_ao_otimo():
+            selecionar_otimo(st.session_state.m02_a_individual)
+        st.checkbox("Mostrar pontos ótimos", key="m02_a_otimos", on_change=mudar_otimos)
+        st.button("Ir para lucro máximo", on_click=ir_ao_otimo)
+    if estado.mostrar_otimos:
+        r = avaliar_firma(estado.escolha.q, estado.escolha.parametros)
+        st.caption(f"Q_R={numero(r.otimos.q_receita)} · Q_M={numero(r.otimos.q_lucro)}. Receita máxima e lucro máximo são critérios distintos. Guias de quantidade não representam ótimos de custo.")
+
+    if estado.aviso_dominio:
+        st.warning(estado.aviso_dominio)
+    r = avaliar_firma(estado.escolha.q, estado.escolha.parametros)
+    c = r.curvas
+    indicadores = [("Quantidade (unidades)",c.q),("Preço da demanda (u.m./unidade)",c.preco_demanda)]
+    if estado.perspectiva == "Resultados Totais":
+        indicadores += [("Receita total (u.m.)",c.receita_total),("Custo total (u.m.)",r.custo_total),("Lucro (u.m.)",r.lucro)]
+    else:
+        indicadores += [("Receita marginal (u.m./unidade)",c.receita_marginal),("Custo marginal (u.m./unidade)",c.custo_marginal),("RMg − CMg (u.m./unidade)",r.diferenca_marginal)]
+    with st.container(key="m02_a_indicadores", horizontal=True):
+        for rotulo, valor in indicadores:
+            st.metric(rotulo, numero(valor), width=200)
+    for aviso in condicoes_excepcionais(estado.escolha):
+        st.info(aviso)
+    with st.container(key="m02_a_sintese"):
+        st.write(sintese(estado))
+    if estado.em_interacao:
+        st.caption("Valores e gráfico acompanham o arraste. A síntese será consolidada ao soltar o controle.")
+    with st.expander("Compreenda o mecanismo · opcional", key="m02_a_explicacao", on_change="rerun"):
+        nivel = st.radio("Nível de explicação", ("Essencial","Econômica","Matemática"), horizontal=True, key="m02_a_nivel")
+        st.write(explicacao(estado.confirmado, nivel))
+    with st.expander("Ideias para investigar · opcional", key="m02_a_ideias", on_change="rerun"):
+        for ideia in IDEIAS:
+            st.write("• " + ideia)
