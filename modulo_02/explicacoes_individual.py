@@ -77,6 +77,32 @@ def condicoes_excepcionais(escolha: Escolha) -> list[str]:
     return avisos
 
 
+def resumo_economico(estado: EstadoIndividual) -> str:
+    """Uma síntese principal; o catálogo completo permanece no aprofundamento."""
+    escolha = estado.escolha
+    r = avaliar_firma(escolha.q, escolha.parametros)
+    if escolha.q == 0:
+        if r.otimos.q_lucro == 0:
+            return "Não produzir maximiza o lucro neste cenário; não há transação e o custo fixo comprometido permanece."
+        return "Em Q=0, o preço indicado é o intercepto da demanda, sem transação efetiva."
+    if r.otimos.q_lucro == 0:
+        return "Esta produção hipotética é admissível para investigação, mas não maximiza o lucro."
+    if escolha.q == escolha.parametros.q_max:
+        return "A produção está no limite do domínio; uma expansão adicional não é admissível."
+    if r.lucro < 0:
+        return "A receita é inferior ao custo total. Isso não implica fechamento automático da firma."
+    if not estado.interagiu:
+        return sintese(estado)
+    anterior, atual = estado.anterior.parametros, estado.confirmado.parametros
+    alterados = [nome for nome in ("a", "b", "c", "s", "cf") if getattr(anterior,nome) != getattr(atual,nome)]
+    if alterados == ["cf"]:
+        direcao = "aumentou e reduziu" if atual.cf > anterior.cf else "diminuiu e elevou"
+        return f"O custo fixo {direcao} o lucro, sem mudar a quantidade ótima."
+    if len(alterados) > 1:
+        return "As diferenças refletem alterações simultâneas na demanda e/ou nos custos."
+    return mensagem_marginal(estado.confirmado) if estado.perspectiva == "Análise Marginal" else mensagem_quantidade(estado.confirmado)
+
+
 def explicacao(escolha: Escolha, nivel: str) -> str:
     if nivel == "Essencial":
         return mensagem_quantidade(escolha) + " " + mensagem_marginal(escolha)
@@ -90,14 +116,27 @@ def explicacao(escolha: Escolha, nivel: str) -> str:
         )
     if nivel == "Matemática":
         return (
-            "P_D(Q)=a−bQ; RT(Q)=aQ−bQ²; CT(Q)=CF+cQ+(s/2)Q²; π(Q)=RT(Q)−CT(Q). "
-            "RMg(Q)=a−2bQ; CMg(Q)=c+sQ. Domínio: 0≤Q≤a/b. "
-            "Q_R=a/(2b); Q_M=max(0,(a−c)/(2b+s)). Em a=c, a igualdade marginal ocorre "
-            "na fronteira; em a<c, não existe interseção ótima em Q≥0. "
-            "Igualdade computacional usa |Q−Q_M|≤10⁻¹²·max(|Q|,|Q_M|); proximidade "
-            "pedagógica de até 1% é distinta e só se aplica quando Q_M>0."
+            "As expressões estão agrupadas abaixo. CF é um encargo comprometido: "
+            "altera o lucro, mas não a quantidade que o maximiza. Em Q=0, "
+            "o intercepto da demanda não é um preço efetivamente transacionado."
         )
     raise ValueError("Nível desconhecido.")
+
+
+GRUPOS_MATEMATICOS = (
+    ("Demanda e receita", r"\begin{aligned}P_D(Q)&=a-bQ\\RT(Q)&=aQ-bQ^2\\RMg(Q)&=a-2bQ\end{aligned}"),
+    ("Custos e lucro", r"\begin{aligned}CV(Q)&=cQ+\frac{s}{2}Q^2\\CT(Q)&=CF+CV(Q)\\CMg(Q)&=c+sQ\\\pi(Q)&=RT(Q)-CT(Q)\end{aligned}"),
+    ("Condições de maximização", r"\begin{aligned}Q_R&=\frac{a}{2b}\\Q_M&=\max\!\left(0,\frac{a-c}{2b+s}\right)\\a>c&\implies RMg(Q_M)=CMg(Q_M),\quad Q_M>0\end{aligned}"),
+    ("Domínio e casos de fronteira", r"\begin{gathered}0\leq Q\leq\frac{a}{b}\\a=c\implies Q_M=0,\quad RMg(0)=CMg(0)\\a<c\implies Q_M=0,\quad RMg(0)<CMg(0)\end{gathered}"),
+)
+FORMULA_IGUALDADE = r"|Q-Q_M|\leq10^{-12}\max(|Q|,|Q_M|)"
+FORMULA_PROXIMIDADE = r"Q_M>0,\quad\frac{|Q-Q_M|}{Q_M}\leq0{,}01"
+TEXTO_PRECISAO = (
+    "A igualdade computacional usa os valores internos finitos, sem piso absoluto. "
+    "Se ambos são zero, a regra é satisfeita; Q=0 e Q_M>0 minúsculo não são equivalentes. "
+    "Somente quando não há equivalência computacional se aplica a proximidade pedagógica de até 1%. "
+    "Nenhuma regra arredonda Q nem transforma uma diferença marginal não nula em igualdade."
+)
 
 
 IDEIAS = (

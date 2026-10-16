@@ -1,6 +1,7 @@
 """Estado e eventos de A individual; nenhum resultado econômico em cache."""
 
 from dataclasses import dataclass, field, replace
+from collections.abc import MutableMapping
 import re
 
 from .modelo_firma import calcular_otimos
@@ -31,6 +32,7 @@ class EstadoIndividual:
     sequencias: dict = field(default_factory=dict)
     erros: dict = field(default_factory=dict)
     aviso_dominio: str = ""
+    zoom: dict[str, int] = field(default_factory=dict)
 
 
 def revalidar_sessao(estado: EstadoIndividual) -> EstadoIndividual:
@@ -56,6 +58,7 @@ def revalidar_sessao(estado: EstadoIndividual) -> EstadoIndividual:
         mostrar_otimos=estado.mostrar_otimos, interagiu=estado.interagiu,
         em_interacao=estado.em_interacao, sequencias=dict(estado.sequencias),
         erros=dict(estado.erros), aviso_dominio=estado.aviso_dominio,
+        zoom=dict(getattr(estado, "zoom", {})),
     )
 
 
@@ -81,8 +84,7 @@ def atualizar_parametros(estado: EstadoIndividual, parametros: ParametrosFirma) 
     q = limitar_quantidade(estado.escolha.q, parametros)
     if q != estado.escolha.q:
         estado.aviso_dominio = (
-            "A quantidade foi limitada ao novo máximo do domínio. "
-            "Ampliar o domínio depois não restaura a quantidade descartada."
+            "Q ajustada ao máximo permitido pelo novo domínio."
         )
     estado.escolha = Escolha(parametros, q)
 
@@ -131,3 +133,45 @@ def selecionar_vista(estado: EstadoIndividual, perspectiva: str, foco: str | Non
     estado.perspectiva = perspectiva
     if foco is not None:
         estado.foco = foco
+
+
+def chave_visualizacao(estado: EstadoIndividual) -> str:
+    return "marginal" if estado.perspectiva == "Análise Marginal" else f"totais:{estado.foco}"
+
+
+def alterar_zoom(estado: EstadoIndividual, acao: str) -> None:
+    """Zoom de apresentação por vista, sem alterar a escolha econômica."""
+    chave = chave_visualizacao(estado)
+    nivel = estado.zoom.get(chave, 0)
+    if acao == "ampliar":
+        nivel = min(4, nivel + 1)
+    elif acao == "reduzir":
+        nivel = max(0, nivel - 1)
+    elif acao == "restaurar":
+        nivel = 0
+    else:
+        raise ValueError("Ação de zoom inválida.")
+    estado.zoom[chave] = nivel
+
+
+def restaurar_experimento(sessao: MutableMapping) -> None:
+    """Reinicia apenas A individual, inclusive widgets e rascunhos pendentes.
+
+    Uma geração nova remonta os controles no navegador. Eventos tardios da
+    geração descartada não podem reintroduzir valores ou mensagens antigas.
+    """
+    geracao = sessao.get("m02_a_geracao", 0) + 1
+    for chave in list(sessao):
+        if chave.startswith("m02_a_"):
+            del sessao[chave]
+    sessao["m02_a_geracao"] = geracao
+    sessao["m02_a_individual"] = EstadoIndividual()
+
+
+def aplicar_evento_sessao(sessao: MutableMapping, geracao: int, campo: str, evento: dict) -> bool:
+    if geracao != sessao.get("m02_a_geracao", 0):
+        return False
+    estado = revalidar_sessao(sessao["m02_a_individual"])
+    aplicado = aplicar_evento(estado, campo, evento)
+    sessao["m02_a_individual"] = estado
+    return aplicado
