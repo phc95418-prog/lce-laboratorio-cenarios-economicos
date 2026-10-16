@@ -1,0 +1,154 @@
+{
+  "fase": "Reorganização visual A",
+  "data": "2026-10-16",
+  "branch": "feature/modulo-02",
+  "origem": "dc49246cdbffb199e814116b05e6ac7de000b00c",
+  "url": "http://localhost:8503",
+  "referencias": [
+    "Especificação Funcional v0.4 (DOCX local, contratos de interface consultados)",
+    "Proposta de Reorganização Visual v0.1 (DOCX integral e esboço do Anexo A)"
+  ],
+  "arquivos": [
+    "lce_modulo02.py",
+    "modulo_02/estrutura_visual.py",
+    "modulo_02/interface_individual.py",
+    "modulo_02/graficos_individual.py",
+    "testar_modulo02_visual.py",
+    "evidencias_modulo02_visual_fase_a.json"
+  ],
+  "testes": {
+    "testar_modelo": 10,
+    "testar_interface": 11,
+    "testar_investigacao": 20,
+    "testar_modulo02_modelo": 37,
+    "testar_modulo02_individual": 30,
+    "testar_modulo02_refinamentos": 14,
+    "testar_modulo02_comparacao": 25,
+    "testar_modulo02_visual": 7,
+    "testar_modulo02_controles_js": 9,
+    "testar_modulo02_graficos_comparacao_js": 5,
+    "total": 168,
+    "aprovados": 168,
+    "falhas": 0,
+    "erros": 0,
+    "ignorados": 0
+  },
+  "matriz": [
+    {
+      "id": "FA-01",
+      "entrada": "Q25, parâmetros padrão",
+      "acao": "Abrir Perspectivas e fechar por Escape; abrir Alterar variáveis por Enter; abrir/fechar Visualização",
+      "esperado": "Painéis previsíveis, sem mutação econômica por abrir/fechar",
+      "observado": "Três painéis operáveis; métricas iguais nos ciclos sem edição; foco visível no botão acionado",
+      "metodo": "Navegador real e integração AppTest",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-02",
+      "entrada": "Q25, b1",
+      "acao": "Confirmar Q26,67 e b1,1537 no painel Alterar variáveis",
+      "esperado": "Precisão mantida, gráfico atualizado com painel aberto",
+      "observado": "Campos mostraram 26,67 e 1,1537; domínio mostrado 86,68; curvas atualizaram e continuaram parcialmente visíveis ao lado do painel",
+      "metodo": "Navegador; código do componente de precisão reutilizado sem alterações",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-03",
+      "entrada": "Q26,67,b1,1537",
+      "acao": "Foco Lucro, perspectiva Marginal e retorno a Totais",
+      "esperado": "Parâmetros e Q preservados; sem foco marginal; foco anterior recuperado",
+      "observado": "Métricas não mudaram ao escolher foco; Marginal sem seletor de foco; integração preservou valor exato 80/3 e b1,1537 e recuperou foco Lucro",
+      "metodo": "Navegador e AppTest",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-04",
+      "entrada": "Parâmetros/quantidade alterados, ótimos revelados",
+      "acao": "Abrir lateral por Enter, Restaurar experimento, fechar lateral por Enter",
+      "esperado": "Estado inicial completo, ações somente na lateral",
+      "observado": "Q25, preço75, RT1875, CT812,50, lucro1062,50; erros e zoom removidos, seleção inicial e ótimos ocultos no teste de integração",
+      "metodo": "Navegador e AppTest",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-05",
+      "entrada": "Padrões e ótimos revelados",
+      "acao": "Selecionar Light e Dark pelo menu nativo do Streamlit",
+      "esperado": "Losango Q_R e X Q_M distinguíveis por forma e contorno em ambos os temas; nenhuma mutação econômica",
+      "observado": "Losango branco contornado e X branco contornado perceptíveis em claro/escuro, inclusive legendas. Coordenadas econômicas inalteradas. Teste de contraste não textual superior a 3:1 nas duas superfícies nativas",
+      "metodo": "Navegador, capturas e teste independente de luminância; não é auditoria WCAG completa",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-06",
+      "entrada": "Q25 nos padrões",
+      "acao": "Selecionar região do gráfico e restaurar por Enter em Visualização",
+      "esperado": "Zoom localizado preservado, restauração sem mudar resultados",
+      "observado": "Eixos ampliaram região selecionada e voltaram a Q0–100; indicadores idênticos",
+      "metodo": "Navegador real",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-07",
+      "entrada": "Q25, domínio100",
+      "acao": "Confirmar Q101; depois Q80 e b2",
+      "esperado": "Rejeição vermelha preserva último válido; redução do domínio limita Q e mostra âmbar",
+      "observado": "Erro explícito com último valor válido preservado; b2 limitou Q80 para50 e exibiu aviso âmbar; síntese econômica continuou informativa",
+      "metodo": "Navegador real",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-08",
+      "entrada": "Q25 e padrões",
+      "acao": "Fixar referência na lateral, editar CF atual para400, alternar a Decisões ótimas e encerrar",
+      "esperado": "Comparação anterior funcional, referência preservada e quantidades independentes; retorno à nova barra",
+      "observado": "Δlucro=-400; ótimos26,67 nos dois cenários; retorno individual em Q25, CT1212,50 e lucro662,50. AppTest verificou conservação de perspectiva marginal e ótimos no retorno; regressão comparativa25/25",
+      "metodo": "Navegador e AppTest, além dos testes preexistentes",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-09",
+      "entrada": "Desktop1280x720 e tablet768x900, lateral fechada",
+      "acao": "Observar toolbar, abrir variáveis no tablet e fechar por Escape",
+      "esperado": "Controles sem sobreposição/corte, painel dentro do viewport e sem rolagem horizontal; gráfico observável",
+      "observado": "Toolbar inteira em uma linha; painel no tablet x169–597, y278–666; documentWidth=innerWidth=768. Gráfico parcialmente visível ao lado; ao fechar, área integral recuperada. Conteúdo extenso do painel usa rolagem vertical nativa",
+      "metodo": "Navegador real e medições DOM; capturas parciais conforme rolagem",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-10",
+      "entrada": "Tema e lateral nativos",
+      "acao": "Avaliar fronteira de implementação",
+      "esperado": "Sem opções falsas, hacks de estado interno ou infraestrutura gestual desnecessária",
+      "observado": "Engrenagem informa o caminho real ⋮ → Theme → Light/Dark. Alternância usa o seletor nativo, sem novo toggle Python. Lateral usa setas nativas, clique/Enter; nenhum gesto de arraste novo",
+      "metodo": "Código e navegador",
+      "resultado": "PASSOU"
+    },
+    {
+      "id": "FA-11",
+      "entrada": "Toque, zoom real200%, WCAG completo",
+      "acao": "Manter pendências conhecidas, sem auditoria extensa nesta fase",
+      "esperado": "Não declarar aceite não executado",
+      "observado": "Não executados. Nome acessível das setas nativas é técnico (keyboard_double_arrow_right/left); há orientação na engrenagem. Revisão de rotulagem nativa permanece pendente",
+      "metodo": "Limites da tarefa e observação DOM",
+      "resultado": "BLOQUEADO"
+    }
+  ],
+  "limites_fase_b": [
+    "Comparação mantém controles e arranjo anteriores na área principal; sua migração para toolbar/lateral não foi iniciada.",
+    "Gráficos pareados do componente comparativo mantêm apresentação anterior, incluindo fundo gráfico claro ao usar o tema escuro da página; harmonização visual é trabalho da Fase B.",
+    "Tema direto pela engrenagem não implementado: contexto de tema Python é somente leitura. Foi preservado o seletor nativo funcional, sem manipulação de estado interno do frontend.",
+    "Arraste para abrir lateral não implementado; clique e teclado atendem a interação principal autorizada."
+  ],
+  "observacoes_testes": [
+    "A primeira execução dos testes AppTest encontrou registro V2 ausente em Runtimes novos com módulos em cache. A fixture foi corrigida para reimportar apenas os dois módulos UI entre instâncias AppTest; não houve contorno no produto. Execução final:168/168."
+  ],
+  "capturas": [
+    "lce-fase-a-desktop.jpg",
+    "lce-fase-a-claro.jpg",
+    "lce-fase-a-escuro.jpg",
+    "lce-fase-a-tablet.jpg",
+    "lce-fase-a-tablet-variaveis.jpg",
+    "lce-fase-a-evidencias-brutas.json"
+  ]
+}

@@ -20,6 +20,14 @@ def _valor(resultado, atributo):
     return getattr(resultado, atributo) if hasattr(resultado, atributo) else getattr(resultado.curvas, atributo)
 
 
+def _guia_otimo(fig, x, texto):
+    # Contorno duplo legível em fundo claro ou escuro, sem depender de detectar
+    # o tema Python durante a mudança de tema nativa do Streamlit.
+    fig.add_vline(x=x, line_width=4, line_color="#ffffff")
+    fig.add_vline(x=x, line_width=2, line_dash="dot", line_color="#0f172a",
+                  annotation_text=texto, annotation_position="top right")
+
+
 def grafico_individual(estado: EstadoIndividual) -> go.Figure:
     escolha = estado.escolha
     p, q = escolha.parametros, escolha.q
@@ -53,19 +61,17 @@ def grafico_individual(estado: EstadoIndividual) -> go.Figure:
             if marginal:
                 # Em a<c, Q_M é fronteira, não um encontro de marginais.
                 if p.a < p.c:
-                    fig.add_vline(x=0, line_dash="dot", line_color="#334155",
-                                  annotation_text="Q_M · fronteira", annotation_position="top right")
+                    _guia_otimo(fig,0,"Q_M · fronteira")
                     continue
                 atributo = "receita_marginal"
             elif estado.foco not in ("Geral", "Receita total" if atributo == "receita_total" else "Lucro"):
-                fig.add_vline(x=x, line_dash="dot", line_color="#334155",
-                              annotation_text="Q_R · referência" if atributo == "receita_total" else "Q_M · referência",
-                              annotation_position="top right")
+                _guia_otimo(fig,x,"Q_R · referência" if atributo == "receita_total" else "Q_M · referência")
                 continue
             r = avaliar_firma(x, p)
             fig.add_trace(go.Scatter(x=[x], y=[_valor(r, atributo)], mode="markers",
                                      name=nome + (" · fronteira" if x == 0 else ""),
-                                     marker={"color":"#334155", "symbol":simbolo,"size":12},
+                                     marker={"color":"#ffffff", "symbol":simbolo,"size":15,
+                                             "line":{"color":"#0f172a","width":2}},
                                      meta={"papel":"otimo", "funcao":atributo}))
     minimo, maximo = min(valores), max(valores)
     folga = max(1.0, (maximo-minimo)*0.08)

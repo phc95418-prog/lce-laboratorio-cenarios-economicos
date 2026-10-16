@@ -11,6 +11,7 @@ from .explicacoes_individual import (
     IDEIAS, condicoes_excepcionais, explicacao, numero, sintese, resumo_economico,
     GRUPOS_MATEMATICOS, FORMULA_IGUALDADE, FORMULA_PROXIMIDADE, TEXTO_PRECISAO,
 )
+from .estrutura_visual import cabecalho, lateral, ferramenta, estilo_local
 from .graficos_individual import grafico_individual
 from .modelo_firma import avaliar_firma
 
@@ -52,39 +53,31 @@ def renderizar_individual():
     geracao = st.session_state.get("m02_a_geracao", 0)
     def chave(nome):
         return f"m02_a_{nome}_g{geracao}"
-    st.caption("LABORATÓRIO DE CENÁRIOS ECONÔMICOS · MÓDULO 02")
-    st.title("Decisão de produção da firma")
-    st.write("Experimento A · "+("Comparação controlada" if estado.comparacao else "Investigação individual"))
-    st.caption("Modelo teórico linear-quadrático de uma firma monopolista. Valores monetários em unidades hipotéticas (u.m.).")
-    if estado.comparacao is None:
-        st.button("Restaurar experimento", key="m02_restaurar_a",
-                  on_click=restaurar_experimento, args=(st.session_state,),
-                  help="Reinicia parâmetros, quantidade, perspectivas, zoom e aprofundamentos.")
-        def fixar():
-            from .estado_comparacao import fixar_referencia
-            fixar_referencia(st.session_state.m02_a_individual)
-        st.button("Fixar cenário de referência",on_click=fixar)
+    cabecalho("Comparação controlada" if estado.comparacao else "Investigação individual")
+    estilo_local()
+    def restaurar():
+        restaurar_experimento(st.session_state)
+    def fixar():
+        from .estado_comparacao import fixar_referencia
+        fixar_referencia(st.session_state.m02_a_individual)
+    acoes = [] if estado.comparacao else [
+        ("Restaurar experimento",restaurar,"Reinicia parâmetros, Q, perspectivas, ótimos e aprofundamentos."),
+        ("Fixar cenário de referência",fixar,"Congela os parâmetros atuais e inicia uma comparação controlada."),
+    ]
+    lateral(estado,acoes)
 
-    # Escopo local deste ponto de entrada, sem alterar o Módulo 01.
-    st.html("""<style>
-    .st-key-m02_a_root [data-testid="stCaptionContainer"] {opacity:1;}
-    .st-key-m02_a_indicadores [data-testid="stMetric"] {
-      max-width:100%;border:1px solid #8290a0;
-      border-radius:10px;padding:0.75rem;}
-    .st-key-m02_a_indicadores [data-testid="stMetricLabel"] p {white-space:normal;}
-    .st-key-m02_a_indicadores [data-testid="stMetricLabel"] {min-height:2.8rem;}
-    .st-key-m02_a_indicadores [data-testid="stMetricValue"] {font-size:1.5rem;white-space:normal;}
-    </style>""")
-
-    with st.expander("Parâmetros de demanda", key=chave("demanda"), on_change="rerun"):
-        controle(estado,"a","a · intercepto da demanda (u.m./unidade)")
-        controle(estado,"b","b · inclinação da demanda")
-    with st.expander("Parâmetros de custos", key=chave("custos"), on_change="rerun"):
-        controle(estado,"c","c · custo marginal inicial (u.m./unidade)")
-        controle(estado,"s","s · inclinação do custo marginal")
-        controle(estado,"cf","CF · custo fixo inevitável (u.m.)")
+    def parametros():
+        with st.expander("Parâmetros de demanda", key=chave("demanda"), on_change="rerun"):
+            controle(estado,"a","a · intercepto da demanda (u.m./unidade)")
+            controle(estado,"b","b · inclinação da demanda")
+        with st.expander("Parâmetros de custos", key=chave("custos"), on_change="rerun"):
+            controle(estado,"c","c · custo marginal inicial (u.m./unidade)")
+            controle(estado,"s","s · inclinação do custo marginal")
+            controle(estado,"cf","CF · custo fixo inevitável (u.m.)")
 
     if estado.comparacao is not None:
+        # Fase A: a comparação mantém sua organização e controles aprovados.
+        parametros()
         from .interface_comparacao import renderizar_comparacao
         renderizar_comparacao(estado, CONTROLE)
         return
@@ -92,47 +85,50 @@ def renderizar_individual():
     def mudar_vista():
         if geracao == st.session_state.get("m02_a_geracao", 0):
             selecionar_vista(st.session_state.m02_a_individual, st.session_state[chave("perspectiva")])
-
-    st.radio("Perspectiva", PERSPECTIVAS, horizontal=True, key=chave("perspectiva"),
-             index=PERSPECTIVAS.index(estado.perspectiva), on_change=mudar_vista)
-    if estado.perspectiva == PERSPECTIVAS[0]:
-        def mudar_foco():
-            if geracao != st.session_state.get("m02_a_geracao", 0):
-                return
+    def mudar_foco():
+        if geracao == st.session_state.get("m02_a_geracao",0):
             atual = st.session_state.m02_a_individual
-            selecionar_vista(atual, atual.perspectiva, st.session_state[chave("foco")])
-        st.radio("Foco do gráfico", FOCOS, horizontal=True, key=chave("foco"), on_change=mudar_foco,
-                 index=FOCOS.index(estado.foco))
+            selecionar_vista(atual,atual.perspectiva,st.session_state[chave("foco")])
+    def zoom():
+        alterar_zoom(st.session_state.m02_a_individual,"restaurar")
 
-    def zoom(acao):
-        alterar_zoom(st.session_state.m02_a_individual, acao)
+    with st.container(horizontal=True, gap="small"):
+        with ferramenta("Perspectivas",":material/view_carousel:",chave("ferramenta_perspectivas")):
+            st.radio("Perspectiva",PERSPECTIVAS,key=chave("perspectiva"),
+                     index=PERSPECTIVAS.index(estado.perspectiva),on_change=mudar_vista)
+        with ferramenta("Alterar variáveis",":material/tune:",chave("ferramenta_variaveis"),variaveis=True):
+            controle(estado,"q","Quantidade produzida Q (unidades)")
+            st.caption(f"Domínio atual: 0 ≤ Q ≤ {numero(estado.escolha.parametros.q_max)}. Enter ou perda de foco confirma o campo; a precisão digitada é preservada.")
+            parametros()
+        with ferramenta("Visualização",":material/visibility:",chave("ferramenta_visualizacao")):
+            if estado.perspectiva == PERSPECTIVAS[0]:
+                st.radio("Foco do gráfico",FOCOS,key=chave("foco"),on_change=mudar_foco,
+                         index=FOCOS.index(estado.foco))
+            else:
+                st.caption("Análise Marginal apresenta RMg e CMg conjuntamente, sem seletor de foco.")
+            st.button("Restaurar visualização",on_click=zoom,
+                      help="Recupera a escala original desta perspectiva e foco, sem alterar a simulação.")
+            st.checkbox("Ativar zoom pela roda no gráfico",key=chave("roda"),
+                        help="Desativado inicialmente para preservar a rolagem da página.")
+            st.caption("Arraste uma região para ampliar; Pan move. A roda, quando ativada, amplia no gráfico e continua rolando a página fora dele.")
 
-    st.button("Restaurar visualização", on_click=zoom, args=("restaurar",),
-              help="Recupera a escala original desta perspectiva e foco, sem alterar a simulação.")
-    roda = st.checkbox("Ativar zoom pela roda no gráfico", key=chave("roda"),
-                       help="Desativado inicialmente para preservar a rolagem da página. Fora do gráfico, a roda continua rolando a página.")
-    st.caption("Arraste uma região para ampliá-la. Na barra do gráfico, use Pan para mover e Zoom para selecionar outra região. Restaurar visualização também funciona por teclado. Esses gestos não alteram Q.")
-    # Streamlit 1.65 identifica a figura também pelo conteúdo/configuração.
-    # Cada vista começa com sua escala; dados novos remontam o gráfico. A
-    # revisão permite restaurar mesmo quando os dados não mudaram.
+    st.caption("Modelo teórico linear-quadrático de uma firma monopolista. Valores monetários em unidades hipotéticas (u.m.).")
     vista = chave_visualizacao(estado)
     st.plotly_chart(grafico_individual(estado),
                     key=chave(f"grafico_{vista}_{estado.escolha.parametros}_{estado.zoom.get(vista,0)}"),
                     width="stretch", config={"displayModeBar":True,"displaylogo":False,
-                    "responsive":True,"locale":"pt-BR","scrollZoom":roda,
+                    "responsive":True,"locale":"pt-BR","scrollZoom":st.session_state.get(chave("roda"),False),
                     "modeBarButtonsToRemove":["select2d","lasso2d","autoScale2d","zoomIn2d","zoomOut2d"]})
-    st.caption("Linhas identificadas por nomes e estilos; os círculos indicam a quantidade escolhida. Os valores correspondentes estão abaixo, sem depender de hover. Alterar a simulação, a perspectiva ou o foco reinicia o enquadramento próprio da vista.")
-    controle(estado,"q","Quantidade produzida Q (unidades)")
-    st.caption(f"Domínio atual: 0 ≤ Q ≤ {numero(estado.escolha.parametros.q_max)}. Enter ou perda de foco confirma o campo; a precisão digitada é preservada.")
+    st.caption("Arraste para ampliar; Pan desloca. Escala e roda em Visualização. Linhas por nomes e estilos; círculos indicam Q. Alterar a simulação ou a vista reinicia o enquadramento.")
     with st.container(horizontal=True):
         def mudar_otimos():
             if geracao == st.session_state.get("m02_a_geracao", 0):
                 st.session_state.m02_a_individual.mostrar_otimos = st.session_state[chave("otimos")]
         def ir_ao_otimo():
             selecionar_otimo(st.session_state.m02_a_individual)
-        st.checkbox("Mostrar pontos ótimos", key=chave("otimos"), value=estado.mostrar_otimos,
+        st.checkbox("Mostrar pontos ótimos",key=chave("otimos"),value=estado.mostrar_otimos,
                     on_change=mudar_otimos)
-        st.button("Ir para lucro máximo", on_click=ir_ao_otimo)
+        st.button("Ir para lucro máximo",on_click=ir_ao_otimo)
     if estado.mostrar_otimos:
         r = avaliar_firma(estado.escolha.q, estado.escolha.parametros)
         st.caption(f"Q_R={numero(r.otimos.q_receita)} · Q_M={numero(r.otimos.q_lucro)}. Receita máxima e lucro máximo são critérios distintos. Guias de quantidade não representam ótimos de custo.")
