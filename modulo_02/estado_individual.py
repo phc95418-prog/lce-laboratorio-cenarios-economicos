@@ -33,6 +33,8 @@ class EstadoIndividual:
     erros: dict = field(default_factory=dict)
     aviso_dominio: str = ""
     zoom: dict[str, int] = field(default_factory=dict)
+    comparacao: object | None = None
+    ciclo_comparacao: int = 0
 
 
 def revalidar_sessao(estado: EstadoIndividual) -> EstadoIndividual:
@@ -59,6 +61,8 @@ def revalidar_sessao(estado: EstadoIndividual) -> EstadoIndividual:
         em_interacao=estado.em_interacao, sequencias=dict(estado.sequencias),
         erros=dict(estado.erros), aviso_dominio=estado.aviso_dominio,
         zoom=dict(getattr(estado, "zoom", {})),
+        comparacao=getattr(estado,"comparacao",None),
+        ciclo_comparacao=getattr(estado,"ciclo_comparacao",0),
     )
 
 
@@ -170,5 +174,8 @@ def aplicar_evento_sessao(sessao: MutableMapping, geracao: int, campo: str, even
         return False
     estado = revalidar_sessao(sessao["m02_a_individual"])
     aplicado = aplicar_evento(estado, campo, evento)
+    if estado.comparacao is not None:
+        from .estado_comparacao import revalidar_dominios
+        revalidar_dominios(estado)
     sessao["m02_a_individual"] = estado
     return aplicado

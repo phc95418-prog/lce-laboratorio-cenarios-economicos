@@ -45,17 +45,25 @@ def renderizar_individual():
     if "m02_a_individual" not in st.session_state:
         st.session_state.m02_a_individual = EstadoIndividual()
     estado = revalidar_sessao(st.session_state.m02_a_individual)
+    if estado.comparacao is not None:
+        from .estado_comparacao import revalidar_comparacao
+        estado.comparacao = revalidar_comparacao(estado.comparacao)
     st.session_state.m02_a_individual = estado
     geracao = st.session_state.get("m02_a_geracao", 0)
     def chave(nome):
         return f"m02_a_{nome}_g{geracao}"
     st.caption("LABORATÓRIO DE CENÁRIOS ECONÔMICOS · MÓDULO 02")
     st.title("Decisão de produção da firma")
-    st.write("Experimento A · Investigação individual")
+    st.write("Experimento A · "+("Comparação controlada" if estado.comparacao else "Investigação individual"))
     st.caption("Modelo teórico linear-quadrático de uma firma monopolista. Valores monetários em unidades hipotéticas (u.m.).")
-    st.button("Restaurar experimento", key="m02_restaurar_a",
-              on_click=restaurar_experimento, args=(st.session_state,),
-              help="Reinicia parâmetros, quantidade, perspectivas, zoom e aprofundamentos.")
+    if estado.comparacao is None:
+        st.button("Restaurar experimento", key="m02_restaurar_a",
+                  on_click=restaurar_experimento, args=(st.session_state,),
+                  help="Reinicia parâmetros, quantidade, perspectivas, zoom e aprofundamentos.")
+        def fixar():
+            from .estado_comparacao import fixar_referencia
+            fixar_referencia(st.session_state.m02_a_individual)
+        st.button("Fixar cenário de referência",on_click=fixar)
 
     # Escopo local deste ponto de entrada, sem alterar o Módulo 01.
     st.html("""<style>
@@ -76,11 +84,17 @@ def renderizar_individual():
         controle(estado,"s","s · inclinação do custo marginal")
         controle(estado,"cf","CF · custo fixo inevitável (u.m.)")
 
+    if estado.comparacao is not None:
+        from .interface_comparacao import renderizar_comparacao
+        renderizar_comparacao(estado, CONTROLE)
+        return
+
     def mudar_vista():
         if geracao == st.session_state.get("m02_a_geracao", 0):
             selecionar_vista(st.session_state.m02_a_individual, st.session_state[chave("perspectiva")])
 
-    st.radio("Perspectiva", PERSPECTIVAS, horizontal=True, key=chave("perspectiva"), on_change=mudar_vista)
+    st.radio("Perspectiva", PERSPECTIVAS, horizontal=True, key=chave("perspectiva"),
+             index=PERSPECTIVAS.index(estado.perspectiva), on_change=mudar_vista)
     if estado.perspectiva == PERSPECTIVAS[0]:
         def mudar_foco():
             if geracao != st.session_state.get("m02_a_geracao", 0):
@@ -116,7 +130,8 @@ def renderizar_individual():
                 st.session_state.m02_a_individual.mostrar_otimos = st.session_state[chave("otimos")]
         def ir_ao_otimo():
             selecionar_otimo(st.session_state.m02_a_individual)
-        st.checkbox("Mostrar pontos ótimos", key=chave("otimos"), on_change=mudar_otimos)
+        st.checkbox("Mostrar pontos ótimos", key=chave("otimos"), value=estado.mostrar_otimos,
+                    on_change=mudar_otimos)
         st.button("Ir para lucro máximo", on_click=ir_ao_otimo)
     if estado.mostrar_otimos:
         r = avaliar_firma(estado.escolha.q, estado.escolha.parametros)
