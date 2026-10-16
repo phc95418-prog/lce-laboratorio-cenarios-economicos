@@ -7,6 +7,7 @@
   border-radius:6px;padding:8px;color:inherit;background:transparent;}
 .lce-controle input:focus-visible {outline:3px solid #145da0;outline-offset:3px;}
 .lce-controle .aviso {font-size:0.875rem;line-height:1.4;margin:0;overflow-wrap:anywhere;}
-.lce-controle .aviso:not(:empty) {padding:0.35rem 0;}
-.lce-controle input[aria-invalid="true"] {border:2px solid #a84b0a;}
+.lce-controle .aviso:not(:empty) {padding:0.6rem;border:1px solid #b91c1c;
+  border-radius:6px;background:#fef2f2;color:#991b1b;}
+.lce-controle input[aria-invalid="true"] {border:2px solid #b91c1c;}
 @media (prefers-reduced-motion: reduce) {.lce-controle * {animation:none;transition:none;}}

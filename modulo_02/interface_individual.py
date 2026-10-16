@@ -93,16 +93,21 @@ def renderizar_individual():
     def zoom(acao):
         alterar_zoom(st.session_state.m02_a_individual, acao)
 
-    nivel_zoom = estado.zoom.get(chave_visualizacao(estado), 0)
-    with st.container(horizontal=True):
-        st.button("Ampliar gráfico", on_click=zoom, args=("ampliar",), disabled=nivel_zoom >= 4)
-        st.button("Reduzir gráfico", on_click=zoom, args=("reduzir",), disabled=nivel_zoom == 0)
-        st.button("Restaurar visualização", on_click=zoom, args=("restaurar",), disabled=nivel_zoom == 0)
-    st.caption(f"Zoom: {numero(1.5**nivel_zoom)}× · centrado na quantidade escolhida. Cada perspectiva e foco conserva seu zoom; o domínio econômico permanece válido.")
-
-    st.plotly_chart(grafico_individual(estado), key="m02_a_grafico", width="stretch",
-                    config={"displayModeBar":False,"responsive":True,"locale":"pt-BR"})
-    st.caption("Linhas identificadas por nomes e estilos; os círculos indicam a quantidade escolhida. Os valores correspondentes estão abaixo, sem depender de hover.")
+    st.button("Restaurar visualização", on_click=zoom, args=("restaurar",),
+              help="Recupera a escala original desta perspectiva e foco, sem alterar a simulação.")
+    roda = st.checkbox("Ativar zoom pela roda no gráfico", key=chave("roda"),
+                       help="Desativado inicialmente para preservar a rolagem da página. Fora do gráfico, a roda continua rolando a página.")
+    st.caption("Arraste uma região para ampliá-la. Na barra do gráfico, use Pan para mover e Zoom para selecionar outra região. Restaurar visualização também funciona por teclado. Esses gestos não alteram Q.")
+    # Streamlit 1.65 identifica a figura também pelo conteúdo/configuração.
+    # Cada vista começa com sua escala; dados novos remontam o gráfico. A
+    # revisão permite restaurar mesmo quando os dados não mudaram.
+    vista = chave_visualizacao(estado)
+    st.plotly_chart(grafico_individual(estado),
+                    key=chave(f"grafico_{vista}_{estado.escolha.parametros}_{estado.zoom.get(vista,0)}"),
+                    width="stretch", config={"displayModeBar":True,"displaylogo":False,
+                    "responsive":True,"locale":"pt-BR","scrollZoom":roda,
+                    "modeBarButtonsToRemove":["select2d","lasso2d","autoScale2d","zoomIn2d","zoomOut2d"]})
+    st.caption("Linhas identificadas por nomes e estilos; os círculos indicam a quantidade escolhida. Os valores correspondentes estão abaixo, sem depender de hover. Alterar a simulação, a perspectiva ou o foco reinicia o enquadramento próprio da vista.")
     controle(estado,"q","Quantidade produzida Q (unidades)")
     st.caption(f"Domínio atual: 0 ≤ Q ≤ {numero(estado.escolha.parametros.q_max)}. Enter ou perda de foco confirma o campo; a precisão digitada é preservada.")
     with st.container(horizontal=True):
@@ -118,7 +123,7 @@ def renderizar_individual():
         st.caption(f"Q_R={numero(r.otimos.q_receita)} · Q_M={numero(r.otimos.q_lucro)}. Receita máxima e lucro máximo são critérios distintos. Guias de quantidade não representam ótimos de custo.")
 
     if estado.aviso_dominio:
-        st.warning(estado.aviso_dominio)
+        st.warning("Atenção: " + estado.aviso_dominio, icon="⚠️")
         def dispensar_aviso():
             st.session_state.m02_a_individual.aviso_dominio = ""
         st.button("Dispensar aviso de ajuste", on_click=dispensar_aviso)
@@ -133,7 +138,7 @@ def renderizar_individual():
         for rotulo, valor in indicadores:
             st.metric(rotulo, numero(valor), width=200)
     with st.container(key="m02_a_sintese"):
-        st.write(resumo_economico(estado))
+        st.info("Informação econômica: " + resumo_economico(estado), icon="ℹ️")
     if estado.em_interacao:
         st.html('<p role="status" aria-live="polite">Atualizando gráfico e indicadores; síntese ao terminar.</p>')
     with st.expander("Compreenda o mecanismo · opcional", key=chave("explicacao"), on_change="rerun"):

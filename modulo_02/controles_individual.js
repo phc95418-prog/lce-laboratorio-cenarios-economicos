@@ -8,7 +8,7 @@ export default function(component) {
     root.innerHTML = `<label class="rotulo"></label><div class="entradas">
       <input class="slider" type="range" step="any">
       <input class="campo" type="text" inputmode="decimal" autocomplete="off" spellcheck="false">
-      </div><p class="aviso" role="status" aria-live="polite"></p>`;
+      </div><p class="aviso" role="alert" aria-live="assertive"></p>`;
     parentElement.appendChild(root);
     root.seq = 0;
     root.active = false;
@@ -20,6 +20,9 @@ export default function(component) {
   const range = root.querySelector('.slider');
   const input = root.querySelector('.campo');
   const notice = root.querySelector('.aviso');
+  const apresentarErro = texto => {
+    notice.textContent = texto ? `⚠ Erro: ${texto} Último valor válido preservado.` : '';
+  };
   const label = root.querySelector('.rotulo');
   const represent = v => String(v).replace('.', ',');
   label.textContent = data.rotulo;
@@ -52,7 +55,7 @@ export default function(component) {
       range.value = String(data.valor);
       if (!root.editing || !root.dirty) input.value = represent(data.valor);
     }
-    notice.textContent = data.erro;
+    apresentarErro(data.erro);
     input.setAttribute('aria-invalid', data.erro ? 'true' : 'false');
   }
   if (root.value === undefined) {
@@ -90,7 +93,7 @@ export default function(component) {
     const completo = /^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)(?:[eE][+-]?\d+)?$/.test(texto);
     const valor = completo ? Number(texto.replace(',', '.')) : NaN;
     if (!Number.isFinite(valor) || valor < data.minimo || valor > data.maximo) {
-      notice.textContent = `Entrada rejeitada. Use um número completo entre ${represent(data.minimo)} e ${represent(data.maximo)}.`;
+      apresentarErro(`Entrada rejeitada. Use um número completo entre ${represent(data.minimo)} e ${represent(data.maximo)}.`);
       input.setAttribute('aria-invalid','true');
       trace('invalido',root.value);
       send({fase:'invalido',texto});

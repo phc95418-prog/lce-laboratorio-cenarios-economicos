@@ -140,18 +140,15 @@ def chave_visualizacao(estado: EstadoIndividual) -> str:
 
 
 def alterar_zoom(estado: EstadoIndividual, acao: str) -> None:
-    """Zoom de apresentação por vista, sem alterar a escolha econômica."""
-    chave = chave_visualizacao(estado)
-    nivel = estado.zoom.get(chave, 0)
-    if acao == "ampliar":
-        nivel = min(4, nivel + 1)
-    elif acao == "reduzir":
-        nivel = max(0, nivel - 1)
-    elif acao == "restaurar":
-        nivel = 0
-    else:
+    """Invalida somente o enquadramento da vista atual no navegador.
+
+    O zoom livre e o deslocamento pertencem ao Plotly, não ao estado econômico.
+    O contador força uma figura nova mesmo quando os dados não mudaram.
+    """
+    if acao != "restaurar":
         raise ValueError("Ação de zoom inválida.")
-    estado.zoom[chave] = nivel
+    chave = chave_visualizacao(estado)
+    estado.zoom[chave] = estado.zoom.get(chave, 0) + 1
 
 
 def restaurar_experimento(sessao: MutableMapping) -> None:

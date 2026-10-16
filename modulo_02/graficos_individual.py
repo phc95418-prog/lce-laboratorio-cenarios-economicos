@@ -69,21 +69,15 @@ def grafico_individual(estado: EstadoIndividual) -> go.Figure:
                                      meta={"papel":"otimo", "funcao":atributo}))
     minimo, maximo = min(valores), max(valores)
     folga = max(1.0, (maximo-minimo)*0.08)
-    nivel = estado.zoom.get(chave_visualizacao(estado), 0)
-    fator = 1.5 ** nivel
-    largura = p.q_max / fator
-    x0 = max(0.0, min(q-largura/2, p.q_max-largura)) if nivel else 0.0
-    ys = [_valor(escolhido, atributo) for atributo, _, _ in series.values()]
-    centro_y = (min(ys)+max(ys))/2
-    y_base = (minimo-folga, maximo+folga)
-    altura = (y_base[1]-y_base[0])/fator
-    y_range = [centro_y-altura/2, centro_y+altura/2] if nivel else list(y_base)
     fig.update_layout(
         height=420, margin={"l":15,"r":15,"t":10,"b":20},
-        xaxis={"title":"Quantidade (unidades)", "range":[x0,min(p.q_max,x0+largura)], "fixedrange":True},
-        yaxis={"title":"u.m./unidade" if marginal else "u.m.", "range":y_range, "fixedrange":True},
+        xaxis={"title":"Quantidade (unidades)", "range":[0,p.q_max],
+               "minallowed":0, "maxallowed":p.q_max, "fixedrange":False},
+        yaxis={"title":"u.m./unidade" if marginal else "u.m.",
+               "range":[minimo-folga,maximo+folga], "fixedrange":False},
         legend={"orientation":"h","y":1.02,"yanchor":"bottom","x":0},
         font={"size":14}, template="plotly_white", separators=",.",
-        transition={"duration":0}, uirevision=f"{chave_visualizacao(estado)}:{nivel}",
+        dragmode="zoom", transition={"duration":0},
+        uirevision=f"{chave_visualizacao(estado)}:{p}:{estado.zoom.get(chave_visualizacao(estado),0)}",
     )
     return fig

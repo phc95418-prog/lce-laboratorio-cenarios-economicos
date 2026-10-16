@@ -49,8 +49,18 @@ test('inválidos mantêm valor e emitem aviso acessível',()=>{
   for(const text of ['', '26,', 'abc', '101']){
     s.fire('.campo','focus');s.node('.campo').value=text;s.fire('.campo','input');s.fire('.campo','keydown','Enter');
     assert.equal(s.parent.root.value,25);assert.match(s.node('.aviso').textContent,/rejeitada/);
+    assert.match(s.node('.aviso').textContent,/Erro:.*Último valor válido preservado/);
     assert.equal(s.node('.campo').attrs.get('aria-invalid'),'true');
   }
+});
+test('erro confirmado pelo servidor mantém contexto e some após correção válida',()=>{
+  const s=setup();s.c.data.erro='Valor fora da faixa permitida.';render(s.c);
+  assert.match(s.node('.aviso').textContent,/Erro:.*fora da faixa.*Último valor válido preservado/);
+  assert.equal(s.parent.root.value,25);
+  s.fire('.campo','focus');s.node('.campo').value='26,67';s.fire('.campo','input');s.fire('.campo','keydown','Enter');
+  assert.equal(s.node('.aviso').textContent,'');
+  assert.equal(s.node('.campo').attrs.get('aria-invalid'),'false');
+  assert.equal(s.parent.root.value,26.67);
 });
 test('rerender preserva rascunho e ignora confirmação atrasada',()=>{
   const s=setup();s.fire('.campo','focus');s.node('.campo').value='26,';s.fire('.campo','input');render(s.c);

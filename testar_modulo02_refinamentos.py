@@ -50,7 +50,7 @@ class Restauracao(unittest.TestCase):
     def test_ir_ao_otimo_preserva_parametros_vista_foco_e_zoom(self):
         p = ParametrosFirma(a=120,b=1.1537,cf=400)
         e = EstadoIndividual(escolha=Escolha(p,25),perspectiva="Análise Marginal",foco="Lucro",mostrar_otimos=True)
-        alterar_zoom(e,"ampliar")
+        alterar_zoom(e,"restaurar")
         selecionar_otimo(e)
         self.assertEqual(e.escolha.parametros,p)
         self.assertEqual(e.escolha.q,(120-20)/(2*1.1537+1))
@@ -59,70 +59,61 @@ class Restauracao(unittest.TestCase):
 
 
 class Zoom(unittest.TestCase):
-    def test_muda_somente_limites_visiveis_sem_mudar_curvas_ou_escolha(self):
+    def test_gestos_habilitados_e_dominio_limitado(self):
+        for p in (ParametrosFirma(), ParametrosFirma(a=60,b=2), ParametrosFirma(b=1.1537)):
+            for q in (0,p.q_max/2,p.q_max):
+                fig = grafico_individual(EstadoIndividual(escolha=Escolha(p,q)))
+                self.assertEqual(fig.layout.dragmode,"zoom")
+                self.assertFalse(fig.layout.xaxis.fixedrange)
+                self.assertFalse(fig.layout.yaxis.fixedrange)
+                self.assertEqual(fig.layout.xaxis.range,(0,p.q_max))
+                self.assertEqual(fig.layout.xaxis.minallowed,0)
+                self.assertEqual(fig.layout.xaxis.maxallowed,p.q_max)
+                self.assertTrue(all(0 <= x <= p.q_max for t in fig.data for x in t.x))
+
+    def test_restauracao_nao_muda_economia_curvas_ou_mensagens(self):
+        from copy import deepcopy
+        e = EstadoIndividual(escolha=Escolha(q=75),erros={"a":"entrada inválida"},aviso_dominio="ajuste")
+        anterior = deepcopy(e)
+        fig = grafico_individual(e)
+        alterar_zoom(e,"restaurar")
+        novo = grafico_individual(e)
+        self.assertNotEqual(fig.layout.uirevision,novo.layout.uirevision)
+        self.assertEqual(fig.data,novo.data)
+        self.assertEqual(fig.layout.xaxis.range,novo.layout.xaxis.range)
+        self.assertEqual(fig.layout.yaxis.range,novo.layout.yaxis.range)
+        e.zoom = anterior.zoom
+        self.assertEqual(e,anterior)
+
+    def test_restauracao_independente_por_vista(self):
+        e = EstadoIndividual(); alterar_zoom(e,"restaurar")
+        selecionar_vista(e,"Resultados Totais","Lucro")
+        alterar_zoom(e,"restaurar"); alterar_zoom(e,"restaurar")
+        selecionar_vista(e,"Análise Marginal")
+        alterar_zoom(e,"restaurar")
+        self.assertEqual(e.zoom,{"totais:Geral":1,"totais:Lucro":2,"marginal":1})
+        with self.assertRaises(ValueError):
+            alterar_zoom(e,"ampliar")
+
+    def test_vistas_e_parametros_possuem_enquadramentos_proprios(self):
+        e = EstadoIndividual()
+        base = grafico_individual(e)
+        selecionar_vista(e,"Análise Marginal")
+        marginal = grafico_individual(e)
+        self.assertNotEqual(base.layout.uirevision,marginal.layout.uirevision)
+        self.assertLessEqual(marginal.layout.yaxis.range[0],-100)
+        e.escolha = Escolha(ParametrosFirma(a=60,b=2),25)
+        novo = grafico_individual(e)
+        self.assertNotEqual(marginal.layout.uirevision,novo.layout.uirevision)
+        self.assertEqual(novo.layout.xaxis.range,(0,30))
+
+    def test_revisao_plotly_nao_depende_da_quantidade(self):
         e = EstadoIndividual()
         antes = grafico_individual(e)
-        resultado = avaliar_firma(e.escolha.q,e.escolha.parametros)
-        for _ in range(2):
-            alterar_zoom(e,"ampliar")
+        e.escolha = Escolha(q=80/3)
         depois = grafico_individual(e)
-        self.assertEqual(e.escolha,Escolha())
-        self.assertEqual(avaliar_firma(e.escolha.q,e.escolha.parametros),resultado)
-        self.assertEqual([(tuple(t.x),tuple(t.y)) for t in antes.data],
-                         [(tuple(t.x),tuple(t.y)) for t in depois.data])
-        self.assertLess(depois.layout.xaxis.range[1]-depois.layout.xaxis.range[0],100)
-        self.assertLess(depois.layout.yaxis.range[1]-depois.layout.yaxis.range[0],
-                        antes.layout.yaxis.range[1]-antes.layout.yaxis.range[0])
-        alterar_zoom(e,"restaurar")
-        restaurado = grafico_individual(e)
-        self.assertEqual(restaurado.layout.xaxis.range,antes.layout.xaxis.range)
-        self.assertEqual(restaurado.layout.yaxis.range,antes.layout.yaxis.range)
-
-    def test_zoom_nas_fronteiras_nao_expande_dominio(self):
-        for p in (ParametrosFirma(),ParametrosFirma(a=60,b=2),ParametrosFirma(b=1.1537)):
-            for q in (0,p.q_max/2,p.q_max):
-                e = EstadoIndividual(escolha=Escolha(p,q))
-                for _ in range(4):
-                    alterar_zoom(e,"ampliar")
-                    fig = grafico_individual(e)
-                    x0,x1 = fig.layout.xaxis.range
-                    self.assertGreaterEqual(x0,0)
-                    self.assertLessEqual(x1,p.q_max)
-                    self.assertGreater(x1,x0)
-                    self.assertLessEqual(x0,q)
-                    self.assertGreaterEqual(x1,q)
-                    self.assertTrue(all(0 <= x <= p.q_max for t in fig.data for x in t.x))
-
-    def test_zoom_independente_por_perspectiva_e_foco(self):
-        e = EstadoIndividual(); alterar_zoom(e,"ampliar")
-        selecionar_vista(e,"Resultados Totais","Lucro")
-        self.assertEqual(e.zoom.get(chave_visualizacao(e),0),0)
-        alterar_zoom(e,"ampliar"); alterar_zoom(e,"ampliar")
-        selecionar_vista(e,"Análise Marginal")
-        self.assertEqual(e.zoom.get(chave_visualizacao(e),0),0)
-        alterar_zoom(e,"ampliar"); alterar_zoom(e,"restaurar")
-        selecionar_vista(e,"Resultados Totais","Lucro")
-        self.assertEqual(e.zoom[chave_visualizacao(e)],2)
-        selecionar_vista(e,"Resultados Totais","Geral")
-        self.assertEqual(e.zoom[chave_visualizacao(e)],1)
-
-    def test_limites_e_reducao_do_zoom(self):
-        e = EstadoIndividual()
-        for _ in range(8):
-            alterar_zoom(e,"ampliar")
-        self.assertEqual(e.zoom[chave_visualizacao(e)],4)
-        for _ in range(8):
-            alterar_zoom(e,"reduzir")
-        self.assertEqual(e.zoom[chave_visualizacao(e)],0)
-        with self.assertRaises(ValueError):
-            alterar_zoom(e,"invalido")
-
-    def test_restaurar_visualizacao_recupera_rmg_negativa(self):
-        e = EstadoIndividual(escolha=Escolha(q=75),perspectiva="Análise Marginal")
-        alterar_zoom(e,"ampliar"); alterar_zoom(e,"restaurar")
-        fig = grafico_individual(e)
-        self.assertLessEqual(fig.layout.yaxis.range[0],-100)
-        self.assertEqual(e.escolha.q,75)
+        self.assertEqual(antes.layout.uirevision,depois.layout.uirevision)
+        self.assertEqual(e.escolha.q,80/3)
 
 
 class MensagensEMatematica(unittest.TestCase):
