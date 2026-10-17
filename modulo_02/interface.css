@@ -1,0 +1,35 @@
+/* Escopo do Módulo 02. Não oculta menus ou controles nativos. */
+body:has(.st-key-m02_a_root) [data-testid="stMainBlockContainer"] {
+  padding-top:3.5rem;padding-inline:clamp(1rem,4vw,4rem);padding-bottom:3rem;
+}
+.st-key-m02_a_root {max-width:1320px;margin-inline:auto;gap:.65rem;}
+.st-key-m02_cabecalho {gap:.75rem;}
+.st-key-m02_titulo {gap:.15rem;min-width:min(100%,320px);}
+.st-key-m02_titulo h1 {
+  font-size:clamp(1.65rem,2.5vw,2.125rem);line-height:1.2;padding:0;margin:0 0 1rem;
+}
+.st-key-m02_titulo [data-testid="stCaptionContainer"] p {
+  font-size:.8rem;line-height:1.45;letter-spacing:.035em;
+}
+.st-key-m02_contexto {gap:0;}
+.st-key-m02_contexto p {line-height:1.45;}
+.st-key-m02_contexto [data-testid="stCaptionContainer"] p {font-size:.9rem;}
+.st-key-m02_experimento button {min-height:42px;padding:.5rem 1.1rem;}
+.st-key-m02_experimento p {font-size:1rem;}
+.st-key-m02_ferramentas {padding:.3rem 0 .15rem;}
+.st-key-m02_ferramentas button,
+.st-key-m02_acoes_cabecalho button {min-height:42px;}
+.st-key-m02_ferramentas button p {font-size:1rem;font-weight:500;}
+.st-key-m02_a_root [data-testid="stWidgetLabel"] p {font-size:1rem;line-height:1.5;}
+.st-key-m02_ajuda_corpo p {max-width:65ch;line-height:1.55;}
+@media (min-width:1600px) {
+  .st-key-m02_a_root [data-testid="stCaptionContainer"] p {font-size:.95rem;}
+  .st-key-m02_titulo [data-testid="stCaptionContainer"] p {font-size:.85rem;}
+}
+@media (max-width:600px) {
+  body:has(.st-key-m02_a_root) [data-testid="stMainBlockContainer"] {padding-top:3.5rem;}
+  .st-key-m02_cabecalho > :first-child {flex-basis:100%;min-width:100%;}
+  .st-key-m02_cabecalho > :last-child {margin-left:auto;}
+  .st-key-m02_acoes_cabecalho {gap:.5rem;}
+  .st-key-m02_experimento button {padding:.5rem .8rem;}
+}

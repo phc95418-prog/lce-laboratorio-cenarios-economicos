@@ -7,9 +7,10 @@ from .estado_b import (
 )
 from .estado_individual import LIMITES
 from .interface_individual import CONTROLE
-from .estrutura_visual import cabecalho, estilo_local, ferramenta, lateral
+from .estrutura_visual import cabecalho, ferramenta, lateral, barra_ferramentas
+from .textos_interface import REGIOES as ROTULOS_REGIOES, DESCRICOES
 from .estruturas_mercado import avaliar_mercados
-from .graficos_b import grafico_b, NOMES
+from .graficos_b import grafico_b
 from .analise_b import renderizar_analise_b, valor_regiao
 from .explicacoes_individual import numero
 from .analise_experimento_a import assinado
@@ -18,7 +19,7 @@ ROTULOS={"a":"a · intercepto da demanda (u.m./unidade)","b":"b · inclinação 
          "c":"c · custo marginal inicial (u.m./unidade)","s":"s · inclinação do custo marginal"}
 
 
-def renderizar_b():
+def renderizar_b(*, acoes_cabecalho=None):
     if "m02_b_estado" not in st.session_state: st.session_state.m02_b_estado=EstadoB()
     def atual():
         st.session_state.m02_b_estado=revalidar_b(st.session_state.m02_b_estado)
@@ -40,10 +41,9 @@ def renderizar_b():
         st.caption(" · ".join(f"{k}={numero(getattr(e.parametros,k))}" for k in CAMPOS))
         st.write(e.modo)
         if e.modo==MODOS[2]:
-            st.caption("Região ativa: "+regiao_ativa(e)+( " · decomposição" if e.decomposicao else " · "+e.regime))
+            st.caption("Região ativa: "+ROTULOS_REGIOES[regiao_ativa(e)]+( " · decomposição" if e.decomposicao else " · "+e.regime))
         st.caption("Um único conjunto de parâmetros para os dois regimes. Importação de A não cria vínculo.")
-    cabecalho(e.modo,experimento="B")
-    estilo_local()
+    cabecalho(e.modo,experimento="B",acoes=acoes_cabecalho)
     lateral(e,[
         ("Utilizar parâmetros do Experimento A",importar,"Copia a, b, c e s do cenário Atual de A, sem CF ou sincronização."),
         ("Restaurar parâmetros do B",restaurar,"Recupera (100,1,20,1) e preserva modos e seleções."),
@@ -58,7 +58,7 @@ def renderizar_b():
         CONTROLE(key=k,on_evento_change=receber,data={"campo":"b_"+campo,"rotulo":ROTULOS[campo],
             "minimo":minimo,"maximo":maximo,"passo":passo,"valor":getattr(e.parametros,campo),
             "seq":e.sequencias.get(campo,0),"erro":e.erros.get(campo,"")})
-    with st.container(horizontal=True,gap="small"):
+    with barra_ferramentas():
         with ferramenta("Perspectivas",":material/view_carousel:",chave("ferramenta_perspectivas")):
             st.radio("Modo do Experimento B",MODOS,index=MODOS.index(e.modo),key=chave("modo"),
                 on_change=selecionar,args=("modo",chave("modo")))
@@ -74,14 +74,14 @@ def renderizar_b():
                 on_change=selecionar,args=("roda",chave("roda")))
             st.caption("Zoom por arraste e Pan modificam só os eixos. Regime e área mantêm o enquadramento com parâmetros fixos.")
     if e.modo==MODOS[2]:
-        st.checkbox("Examinar origem da perda de eficiência",value=e.decomposicao,key=chave("decompor"),on_change=decompor)
+        st.checkbox("Examinar origem da perda de eficiência",value=e.decomposicao,key=chave("decompor"),on_change=decompor,
+            help="Guarda a região principal e o regime; inicia em DWL e mostra uma única região por vez. Ao fechar, restaura as seleções anteriores.")
         if e.decomposicao:
             st.radio("Região da decomposição",PARCELAS,index=PARCELAS.index(e.parcela),horizontal=True,
-                key=chave("parcela"),on_change=selecionar,args=("parcela",chave("parcela")))
-            st.caption("Seleções principais guardadas. Apenas a região da decomposição é preenchida; T não é DWL.")
+                format_func=ROTULOS_REGIOES.__getitem__,key=chave("parcela"),on_change=selecionar,args=("parcela",chave("parcela")))
         else:
             st.radio("Região principal",REGIOES,index=REGIOES.index(e.regiao),horizontal=True,
-                key=chave("regiao"),on_change=selecionar,args=("regiao",chave("regiao")))
+                format_func=ROTULOS_REGIOES.__getitem__,key=chave("regiao"),on_change=selecionar,args=("regiao",chave("regiao")))
             if e.regiao!="DWL":
                 st.radio("Regime para a região",REGIMES,index=REGIMES.index(e.regime),horizontal=True,
                     key=chave("regime"),on_change=selecionar,args=("regime",chave("regime")))
@@ -91,6 +91,9 @@ def renderizar_b():
     r=avaliar_mercados(e.parametros)
     if r.concorrencia.curvas.q==0:
         st.info("Sem comércio de equilíbrio: Q_C=Q_M=0; preços transacionados não aplicáveis. Excedentes, DWL e decomposição são zero. Interceptos são valores das funções.",icon="ℹ️")
+    if e.modo==MODOS[2]:
+        area=regiao_ativa(e)
+        st.caption(DESCRICOES[area] if r.concorrencia.curvas.q>0 else "Sem comércio de equilíbrio: a região selecionada tem área zero.")
     fig=grafico_b(e)
     st.plotly_chart(fig,key=chave(f"grafico_{e.modo}_{e.parametros}_{e.zoom.get(e.modo,0)}"),width="stretch",
         config={"displaylogo":False,"displayModeBar":True,"scrollZoom":e.roda,"responsive":True,
@@ -100,16 +103,16 @@ def renderizar_b():
     def preco(v): return "não aplicável" if v is None else numero(v)
     with st.container(key=chave("indicadores"),horizontal=True):
         if e.modo==MODOS[0]:
-            metricas=[("Q_C (unidades)",numero(r.concorrencia.curvas.q)),("P_C (u.m./unidade)",preco(r.concorrencia.preco_transacao)),
-                      ("Q_M (unidades)",numero(r.monopolio.curvas.q)),("P_M (u.m./unidade)",preco(r.monopolio.preco_transacao))]
+            metricas=[("Quantidade competitiva (Q_C) · unidades",numero(r.concorrencia.curvas.q)),("Preço competitivo (P_C) · u.m./unidade",preco(r.concorrencia.preco_transacao)),
+                      ("Quantidade monopolista (Q_M) · unidades",numero(r.monopolio.curvas.q)),("Preço monopolista (P_M) · u.m./unidade",preco(r.monopolio.preco_transacao))]
         elif e.modo==MODOS[1]:
-            metricas=[("P_C (u.m./unidade)",preco(r.concorrencia.preco_transacao)),("RMg(Q_M) (u.m./unidade)",numero(r.monopolio.curvas.receita_marginal)),
-                      ("CMg(Q_M) (u.m./unidade)",numero(r.monopolio.curvas.custo_marginal)),("P_M (u.m./unidade)",preco(r.monopolio.preco_transacao))]
+            metricas=[("Preço competitivo (P_C) · u.m./unidade",preco(r.concorrencia.preco_transacao)),("Receita marginal em Q_M (RMg) · u.m./unidade",numero(r.monopolio.curvas.receita_marginal)),
+                      ("Custo marginal em Q_M (CMg) · u.m./unidade",numero(r.monopolio.curvas.custo_marginal)),("Preço monopolista (P_M) · u.m./unidade",preco(r.monopolio.preco_transacao))]
         else:
             area=regiao_ativa(e)
-            metricas=[(area+" · "+NOMES[area]+" (u.m.)",numero(valor_regiao(e,r)))]
-            if area!="DWL": metricas.append(("DWL comparativa (u.m.)",numero(r.decomposicao.peso_morto)))
-        for rotulo,valor in metricas: st.metric(rotulo,valor,width=220)
+            metricas=[(ROTULOS_REGIOES[area]+" · u.m.",numero(valor_regiao(e,r)))]
+            if area!="DWL": metricas.append(("Perda de eficiência (DWL) · u.m.",numero(r.decomposicao.peso_morto)))
+        for rotulo,valor in metricas: st.metric(rotulo,valor,width=320 if e.modo==MODOS[2] else 220)
     if e.modo==MODOS[0]:
         variacoes=(r.diferencas.quantidade,r.diferencas.preco)
         st.table({"Grandeza":["Quantidade (unidades)","Preço (u.m./unidade)"],
@@ -120,7 +123,7 @@ def renderizar_b():
     elif e.modo==MODOS[2]:
         with st.expander("Excedentes dos dois regimes e balanço"):
             st.caption("Valores em u.m.; Δ=Monopólio−Concorrência. Sinais não representam julgamento distributivo.")
-            st.table({"Grandeza":["EC","EP","ET"],
+            st.table({"Grandeza":[ROTULOS_REGIOES["EC"],ROTULOS_REGIOES["EP"],"Excedente total (ET)"],
                 "Concorrência":[numero(getattr(r.concorrencia.curvas,k)) for k in ("excedente_consumidor","excedente_produtor","excedente_total")],
                 "Monopólio":[numero(getattr(r.monopolio.curvas,k)) for k in ("excedente_consumidor","excedente_produtor","excedente_total")],
                 "Δ M−C":[assinado(getattr(r.diferencas,k).absoluta) for k in ("excedente_consumidor","excedente_produtor","excedente_total")]})

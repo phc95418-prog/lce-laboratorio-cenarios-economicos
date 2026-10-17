@@ -3,6 +3,7 @@
 from contextlib import contextmanager
 from pathlib import Path
 import streamlit as st
+from .textos_interface import EXPERIMENTOS, FAQ
 
 ACIONADOR = st.components.v2.component(
     "lce_m02_acoes", isolate_styles=False,
@@ -14,12 +15,21 @@ CONFIGURACOES = st.components.v2.component(
     css=Path(__file__).with_name("configuracoes.css").read_text(encoding="utf-8"),
 )
 
-def cabecalho(modo, *, experimento="A"):
-    with st.container(horizontal=True, vertical_alignment="center", gap="small"):
-        with st.container():
+def topo():
+    """Reserva ações antes do seletor, sem consultar ou regravar a economia."""
+    with st.container(horizontal=True, vertical_alignment="center", gap="small", key="m02_cabecalho"):
+        with st.container(key="m02_titulo"):
+            st.title("Módulo 02 · Decisões da Firma", anchor=False)
             st.caption("LCE · LABORATÓRIO DE CENÁRIOS ECONÔMICOS")
-            st.subheader("Módulo 02 · Decisões da Firma", anchor=False)
-            st.caption("Experimento "+experimento+" · "+modo)
+        acoes = st.container(horizontal=True, width="content", gap="small", key="m02_acoes_cabecalho")
+    return acoes
+
+
+def cabecalho(modo, *, experimento="A", acoes=None):
+    with st.container(key="m02_contexto"):
+        st.markdown(f"**Experimento {experimento} · {EXPERIMENTOS[experimento]}**")
+        st.caption(modo)
+    with acoes if acoes is not None else st.container(horizontal=True):
         with st.popover("Configurações", icon=":material/settings:", key="m02_configuracoes"):
             with st.container(width=380,height=420,border=False):
                 CONFIGURACOES(key="m02_configuracoes_reais",data={"comparacao":modo=="Comparação controlada","experimento":experimento})
@@ -33,6 +43,12 @@ def cabecalho(modo, *, experimento="A"):
                     st.write("Q em unidades; preços e marginais em u.m./unidade; totais em u.m. hipotéticas. As simulações são condicionais às hipóteses, não previsões empíricas. A análise detalha a interpretação do custo de oportunidade.")
                     st.caption(f"Streamlit {st.__version__} · Plotly · motor econômico local com precisão interna não arredondada.")
                 st.caption("Aparência usa o seletor nativo; exportação usa o PNG do Plotly. Aba Ações na borda esquerda. Enter aciona controles; Escape fecha os painéis.")
+        with st.popover("Ajuda", icon=":material/help_outline:", key="m02_ajuda"):
+            with st.container(width=440, height=460, border=False, key="m02_ajuda_corpo"):
+                st.subheader("Ajuda e dúvidas frequentes", anchor=False)
+                for pergunta, resposta in FAQ:
+                    with st.expander(pergunta):
+                        st.write(resposta)
 
 
 def lateral(estado, acoes, *, complemento=None, resumo=None):
@@ -56,19 +72,26 @@ def lateral(estado, acoes, *, complemento=None, resumo=None):
 
 
 @contextmanager
+def barra_ferramentas():
+    with st.container(horizontal=True, horizontal_alignment="center", gap="small", key="m02_ferramentas"):
+        yield
+
+
+@contextmanager
 def ferramenta(rotulo, icone, chave, *, variaveis=False):
     """Popover nativo: mantém abertura nos reruns e fecha por fora/Escape.
 
     Não usar renderização condicional pelo estado aberto: controles mantêm
     suas chaves e rascunhos mesmo quando o painel está recolhido.
     """
-    with st.popover(rotulo, icon=icone, key=chave):
+    with st.popover(rotulo, icon=icone, key=chave, width=200):
         with st.container(width=380, height=340 if variaveis else "content", border=False):
             yield
 
 
 def estilo_local():
     ACIONADOR(key="m02_acionador_lateral", data={})
+    st.html("<style>"+Path(__file__).with_name("interface.css").read_text(encoding="utf-8")+"</style>")
     st.html("""<style>
     body:has(.st-key-m02_a_root) [data-testid="stExpandSidebarButton"] {
       position:fixed;left:0;top:10px;width:auto;padding:0.4rem 0.6rem;

@@ -10,7 +10,7 @@ from .estado_individual import (
 from .explicacoes_individual import (
     numero, resumo_economico,
 )
-from .estrutura_visual import cabecalho, lateral, ferramenta, estilo_local
+from .estrutura_visual import cabecalho, lateral, ferramenta, barra_ferramentas
 from .graficos_individual import grafico_individual
 from .modelo_firma import avaliar_firma
 
@@ -41,7 +41,7 @@ def controle(estado, campo, rotulo):
     )
 
 
-def renderizar_individual():
+def renderizar_individual(*, acoes_cabecalho=None):
     if "m02_a_individual" not in st.session_state:
         st.session_state.m02_a_individual = EstadoIndividual()
     estado = revalidar_sessao(st.session_state.m02_a_individual)
@@ -52,8 +52,7 @@ def renderizar_individual():
     geracao = st.session_state.get("m02_a_geracao", 0)
     def chave(nome):
         return f"m02_a_{nome}_g{geracao}"
-    cabecalho("Comparação controlada" if estado.comparacao else "Investigação individual")
-    estilo_local()
+    cabecalho("Comparação controlada" if estado.comparacao else "Investigação individual", acoes=acoes_cabecalho)
     def restaurar():
         restaurar_experimento(st.session_state)
     def fixar():
@@ -90,7 +89,7 @@ def renderizar_individual():
     def zoom():
         alterar_zoom(st.session_state.m02_a_individual,"restaurar")
 
-    with st.container(horizontal=True, gap="small"):
+    with barra_ferramentas():
         with ferramenta("Perspectivas",":material/view_carousel:",chave("ferramenta_perspectivas")):
             st.radio("Perspectiva",PERSPECTIVAS,key=chave("perspectiva"),
                      index=PERSPECTIVAS.index(estado.perspectiva),on_change=mudar_vista)

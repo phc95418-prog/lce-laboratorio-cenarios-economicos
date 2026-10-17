@@ -180,12 +180,12 @@ class AnaliseB(unittest.TestCase):
 
 class IntegracaoB(unittest.TestCase):
     def b(self):
-        at=interface();por_rotulo(at.radio,"Experimento").set_value("Experimento B").run()
+        at=interface();por_rotulo(at.segmented_control,"Experimento").set_value("Experimento B").run()
         self.assertFalse(at.exception)
         return at
-    def test_entrada_padrao_quatro_paineis_e_resultados(self):
+    def test_entrada_padrao_cinco_paineis_e_resultados(self):
         at=self.b()
-        self.assertEqual(len(at.get("popover")),4)
+        self.assertEqual(len(at.get("popover")),5)
         self.assertEqual([m.value for m in at.metric],["40,00","60,00","26,67","73,33"])
         self.assertEqual(por_rotulo(at.radio,"Modo do Experimento B").value,MODOS[0])
         self.assertNotIn("Regime para a região",[x.label for x in at.radio])
@@ -212,21 +212,21 @@ class IntegracaoB(unittest.TestCase):
         a.escolha=Escolha(ParametrosFirma(a=120,cf=1600),25);a.confirmado=a.escolha
         at.run();por_rotulo(at.sidebar.button,"Fixar cenário de referência").click().run()
         antes=deepcopy(at.session_state["m02_a_individual"])
-        por_rotulo(at.radio,"Experimento").set_value("Experimento B").run()
+        por_rotulo(at.segmented_control,"Experimento").set_value("Experimento B").run()
         self.assertEqual(at.session_state["m02_b_estado"].parametros.a,100)
         por_rotulo(at.sidebar.button,"Utilizar parâmetros do Experimento A").click().run()
         self.assertEqual(at.session_state["m02_b_estado"].parametros.a,120)
         por_rotulo(at.radio,"Modo do Experimento B").set_value(MODOS[1]).run()
-        por_rotulo(at.radio,"Experimento").set_value("Experimento A").run()
+        por_rotulo(at.segmented_control,"Experimento").set_value("Experimento A").run()
         self.assertEqual(at.session_state["m02_a_individual"],antes)
-        por_rotulo(at.radio,"Experimento").set_value("Experimento B").run()
+        por_rotulo(at.segmented_control,"Experimento").set_value("Experimento B").run()
         self.assertEqual(at.session_state["m02_b_estado"].modo,MODOS[1])
         self.assertEqual(at.session_state["m02_b_estado"].parametros.a,120)
         self.assertFalse(at.exception)
     def test_nova_sessao_reinicia_a_e_b(self):
         at=self.b();por_rotulo(at.radio,"Modo do Experimento B").set_value(MODOS[2]).run()
         nova=interface();self.assertEqual(nova.session_state["m02_a_individual"].escolha.q,25)
-        por_rotulo(nova.radio,"Experimento").set_value("Experimento B").run()
+        por_rotulo(nova.segmented_control,"Experimento").set_value("Experimento B").run()
         self.assertEqual(nova.session_state["m02_b_estado"],EstadoB())
 
 if __name__=="__main__": unittest.main(verbosity=2)

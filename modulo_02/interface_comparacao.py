@@ -12,7 +12,7 @@ from .explicacoes_comparacao import resumo_comparacao
 from .estado_individual import FOCOS
 from .explicacoes_individual import numero
 from .graficos_comparacao import graficos_comparacao
-from .estrutura_visual import lateral, ferramenta
+from .estrutura_visual import lateral, ferramenta, barra_ferramentas
 
 PASTA = Path(__file__).parent
 # Usa o bundle da dependência Plotly instalada: sem CDN, downloads ou biblioteca
@@ -64,7 +64,7 @@ def renderizar_comparacao(estado, componente_numero, parametros):
         agir(lambda e: setattr(e.comparacao,"foco",st.session_state[chave("foco")]))
     def restaurar(e):
         e.comparacao.revisao += 1
-    with st.container(horizontal=True,gap="small"):
+    with barra_ferramentas():
         with ferramenta("Perspectivas",":material/view_carousel:",chave("ferramenta_perspectivas")):
             st.radio("Perspectiva comparativa",PERSPECTIVAS,key=chave("perspectiva"),
                      index=PERSPECTIVAS.index(c.perspectiva),on_change=perspectiva)
