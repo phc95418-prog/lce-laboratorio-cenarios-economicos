@@ -14,6 +14,7 @@ from .explicacoes_individual import (
     numero, condicoes_excepcionais, GRUPOS_MATEMATICOS, IDEIAS,
 )
 from .graficos_comparacao import graficos_comparacao
+from .estrutura_visual import lateral, ferramenta
 
 PASTA = Path(__file__).parent
 # Usa o bundle da dependência Plotly instalada: sem CDN, downloads ou biblioteca
@@ -25,7 +26,7 @@ GRAFICOS = st.components.v2.component(
 )
 
 
-def renderizar_comparacao(estado, componente_numero):
+def renderizar_comparacao(estado, componente_numero, parametros):
     c = estado.comparacao
     ciclo = estado.ciclo_comparacao
     geracao = st.session_state.get("m02_a_geracao",0)
@@ -38,55 +39,66 @@ def renderizar_comparacao(estado, componente_numero):
                 and atual.comparacao is not None and atual.ciclo_comparacao == ciclo):
             funcao(atual,*args)
 
-    st.subheader("Comparação controlada de cenários")
-    st.caption("Os parâmetros acima pertencem somente ao cenário Atual. A referência permanece congelada.")
-    with st.expander("Parâmetros da referência congelada"):
-        p = c.referencia
-        st.write(f"a={numero(p.a)} · b={numero(p.b)} · c={numero(p.c)} · s={numero(p.s)} · CF={numero(p.cf)} u.m.")
-    with st.container(horizontal=True):
-        def pedir_substituicao(e):
-            e.comparacao.substituindo = True
-        st.button("Substituir referência", on_click=agir,args=(pedir_substituicao,))
-        st.button("Restaurar parâmetros padrão",on_click=agir,args=(restaurar_parametros,))
-        st.button("Encerrar comparação",on_click=agir,args=(encerrar_comparacao,))
-    if c.substituindo:
-        st.info("Confirmar a substituição dos cinco parâmetros da referência pelos atuais? Quantidades escolhidas serão preservadas, salvo restrição do domínio comum.",icon="ℹ️")
-        with st.container(horizontal=True):
+    def pedir_substituicao(e):
+        e.comparacao.substituindo = True
+    def confirmar():
+        if c.substituindo:
+            st.info("Substituir os cinco parâmetros da referência pelos atuais? Quantidades serão preservadas, salvo restrição do domínio comum.",icon="ℹ️")
             st.button("Confirmar substituição",on_click=agir,args=(substituir_referencia,True))
             st.button("Cancelar substituição",on_click=agir,args=(substituir_referencia,False))
+    def resumo():
+        for titulo,p in (("Referência congelada",c.referencia),("Atual",estado.escolha.parametros)):
+            st.markdown("**"+titulo+"**")
+            st.caption(" · ".join(f"{k.upper() if k=='cf' else k}={numero(getattr(p,k))}" for k in ("a","b","c","s","cf")))
+        r,a,_ = resultados_comparacao(estado)
+        st.caption(f"{c.perspectiva} · {c.foco}")
+        st.write(f"Q Referência: {numero(r.curvas.q)} · Q Atual: {numero(a.curvas.q)}")
+        st.caption(f"Q fixa armazenada: {numero(c.q_fixa)}. Q individual preservada: {numero(estado.escolha.q)}.")
+    lateral(estado,[
+        ("Substituir referência",lambda: agir(pedir_substituicao),"Solicita confirmação antes de substituir os parâmetros congelados."),
+        ("Restaurar parâmetros do Atual",lambda: agir(restaurar_parametros),"Restaura somente os parâmetros do cenário Atual."),
+        ("Encerrar comparação",lambda: agir(encerrar_comparacao),"Retorna à investigação individual, preservando sua quantidade."),
+    ],complemento=confirmar,resumo=resumo)
 
     def perspectiva():
-        st.session_state.m02_a_individual.comparacao.perspectiva = st.session_state[chave("perspectiva")]
+        agir(lambda e: setattr(e.comparacao,"perspectiva",st.session_state[chave("perspectiva")]))
     def foco():
-        st.session_state.m02_a_individual.comparacao.foco = st.session_state[chave("foco")]
-    st.radio("Perspectiva comparativa",PERSPECTIVAS,key=chave("perspectiva"),horizontal=True,
-             index=PERSPECTIVAS.index(c.perspectiva),on_change=perspectiva)
-    st.radio("Foco dos dois gráficos",FOCOS,key=chave("foco"),horizontal=True,
-             index=FOCOS.index(c.foco),on_change=foco)
+        agir(lambda e: setattr(e.comparacao,"foco",st.session_state[chave("foco")]))
     def restaurar(e):
         e.comparacao.revisao += 1
-    st.button("Restaurar visualização comparativa",on_click=agir,args=(restaurar,))
-    roda = st.checkbox("Ativar zoom pela roda nos gráficos",key=chave("roda"))
-    st.caption("Arraste uma região para ampliar. Pan move a visualização; Zoom volta à seleção. Qualquer gesto enquadra os dois gráficos igualmente, sem alterar as escolhas econômicas.")
+    with st.container(horizontal=True,gap="small"):
+        with ferramenta("Perspectivas",":material/view_carousel:",chave("ferramenta_perspectivas")):
+            st.radio("Perspectiva comparativa",PERSPECTIVAS,key=chave("perspectiva"),
+                     index=PERSPECTIVAS.index(c.perspectiva),on_change=perspectiva)
+            st.caption("Quantidade fixa e Decisões ótimas preservam Q individual e Q fixa armazenada.")
+        with ferramenta("Alterar variáveis",":material/tune:",chave("ferramenta_variaveis"),variaveis=True):
+            st.caption("Somente o cenário Atual é editável. A Referência permanece congelada.")
+            if c.perspectiva == PERSPECTIVAS[0]:
+                chave_q = chave("quantidade")
+                def receber():
+                    atual = st.session_state.m02_a_individual
+                    if (geracao == st.session_state.get("m02_a_geracao",0)
+                            and atual.comparacao is not None and atual.ciclo_comparacao == ciclo):
+                        retorno = st.session_state.get(chave_q)
+                        aplicar_quantidade(atual,retorno.get("evento") if retorno else None)
+                componente_numero(key=chave_q,on_evento_change=receber,
+                    data={"campo":"q_comparacao","rotulo":"Quantidade comum Q da comparação (unidades)",
+                          "minimo":0,"maximo":dominio_comum(estado),"passo":0.1,"valor":c.q_fixa,
+                          "seq":c.sequencia,"erro":c.erro})
+                st.caption(f"Domínio comum: 0 ≤ Q ≤ {numero(dominio_comum(estado))}. Esta escolha não altera Q individual.")
+            else:
+                st.info("Decisões ótimas: cada cenário é avaliado em sua própria quantidade de lucro máximo. As quantidades podem ser diferentes; nenhuma escolha armazenada é substituída.",icon="ℹ️")
+            parametros()
+        with ferramenta("Visualização",":material/visibility:",chave("ferramenta_visualizacao")):
+            st.radio("Foco dos dois gráficos",FOCOS,key=chave("foco"),
+                     index=FOCOS.index(c.foco),on_change=foco)
+            st.button("Restaurar visualização comparativa",on_click=agir,args=(restaurar,))
+            roda = st.checkbox("Ativar zoom pela roda nos gráficos",key=chave("roda"))
+            st.caption("Arraste para ampliar; Pan move. Os dois gráficos mantêm o mesmo enquadramento. A roda é opcional para preservar a rolagem da página.")
+    st.caption("Referência congelada e Atual · mesmas escalas, curvas limitadas aos respectivos domínios econômicos.")
     figuras, contexto = graficos_comparacao(estado)
     GRAFICOS(key=chave("graficos"),data={"figuras":[f.to_json() for f in figuras],
                                      "contexto":contexto,"roda":roda})
-
-    if c.perspectiva == PERSPECTIVAS[0]:
-        chave_q = chave("quantidade")
-        def receber():
-            atual = st.session_state.m02_a_individual
-            if (geracao == st.session_state.get("m02_a_geracao",0)
-                    and atual.comparacao is not None and atual.ciclo_comparacao == ciclo):
-                retorno = st.session_state.get(chave_q)
-                aplicar_quantidade(atual,retorno.get("evento") if retorno else None)
-        componente_numero(key=chave_q,on_evento_change=receber,
-            data={"campo":"q_comparacao","rotulo":"Quantidade comum Q da comparação (unidades)",
-                  "minimo":0,"maximo":dominio_comum(estado),"passo":0.1,"valor":c.q_fixa,
-                  "seq":c.sequencia,"erro":c.erro})
-        st.caption(f"Domínio comum: 0 ≤ Q ≤ {numero(dominio_comum(estado))}. Esta escolha não altera Q individual.")
-    else:
-        st.info("Decisões ótimas: cada cenário é avaliado em sua própria quantidade de lucro máximo. As quantidades podem ser diferentes; nenhuma escolha armazenada é substituída.",icon="ℹ️")
 
     for mensagem in (estado.aviso_dominio,c.aviso):
         if mensagem:
@@ -108,7 +120,7 @@ def renderizar_comparacao(estado, componente_numero):
               "Atual":[numero(v[2]) for v in dados],"Δ Atual − Referência":[sinal(v[3]) for v in dados]})
     st.caption(f"Q individual preservada: {numero(estado.escolha.q)} unidades. Q fixa armazenada: {numero(c.q_fixa)} unidades.")
     st.info("Informação econômica: "+resumo_comparacao(estado),icon="ℹ️")
-    with st.expander("Compreenda a comparação · opcional"):
+    with st.expander("Compreenda o mecanismo · opcional"):
         for titulo, resultado in (("Referência",r),("Atual",a)):
             for aviso in condicoes_excepcionais(Escolha(resultado.parametros,resultado.curvas.q)):
                 st.write(f"{titulo}: {aviso}")

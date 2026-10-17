@@ -1,4 +1,4 @@
-"""Integração Python da Fase A; abrir/fechar e cores reais exigem navegador."""
+"""Integração das Fases A/B; abrir/fechar e cores reais exigem navegador."""
 
 import unittest
 import sys
@@ -12,7 +12,7 @@ from modulo_02.graficos_individual import grafico_individual
 def interface():
     # Cada AppTest cria um Runtime isolado; registros V2 de outro Runtime
     # não sobrevivem, embora o cache de módulos Python sobreviva no teste.
-    for nome in ("modulo_02.interface_individual","modulo_02.interface_comparacao"):
+    for nome in ("modulo_02.interface_individual","modulo_02.interface_comparacao","modulo_02.estrutura_visual"):
         sys.modules.pop(nome,None)
     return AppTest.from_file("lce_modulo02.py",default_timeout=15).run()
 
@@ -66,7 +66,7 @@ class IntegracaoVisual(unittest.TestCase):
         escolha=at.session_state["m02_a_individual"].escolha
         por_rotulo(at.sidebar.button,"Fixar cenário de referência").click().run()
         self.assertFalse(at.exception)
-        for rotulo in ("Substituir referência","Restaurar parâmetros padrão","Encerrar comparação"):
+        for rotulo in ("Substituir referência","Restaurar parâmetros do Atual","Encerrar comparação"):
             self.assertIn(rotulo,[x.label for x in at.button])
         self.assertNotIn("Ir para lucro máximo",[x.label for x in at.button])
         por_rotulo(at.radio,"Perspectiva comparativa").set_value("Decisões ótimas").run()
@@ -75,6 +75,47 @@ class IntegracaoVisual(unittest.TestCase):
         self.assertEqual(len(at.get("popover")),4)
         self.assertEqual(por_rotulo(at.radio,"Perspectiva").value,"Análise Marginal")
         self.assertTrue(por_rotulo(at.checkbox,"Mostrar pontos ótimos").value)
+
+    def test_comparacao_quatro_paineis_acoes_na_lateral_e_q_independentes(self):
+        at=interface()
+        por_rotulo(at.sidebar.button,"Fixar cenário de referência").click().run()
+        e=at.session_state["m02_a_individual"]
+        e.comparacao.q_fixa=e.comparacao.q_confirmada=30.125
+        e.escolha=Escolha(ParametrosFirma(cf=100),25)
+        antes=deepcopy(e)
+        at.run()
+        self.assertEqual(len(at.get("popover")),4)
+        self.assertEqual([b.label for b in at.sidebar.button],
+                         ["Substituir referência","Restaurar parâmetros do Atual","Encerrar comparação"])
+        por_rotulo(at.radio,"Foco dos dois gráficos").set_value("Lucro").run()
+        por_rotulo(at.radio,"Perspectiva comparativa").set_value("Decisões ótimas").run()
+        e=at.session_state["m02_a_individual"]
+        self.assertEqual(e.escolha,antes.escolha)
+        self.assertEqual(e.comparacao.q_fixa,30.125)
+        self.assertEqual(e.comparacao.referencia,antes.comparacao.referencia)
+        self.assertEqual(e.comparacao.foco,"Lucro")
+        por_rotulo(at.radio,"Perspectiva comparativa").set_value("Quantidade fixa").run()
+        self.assertEqual(at.session_state["m02_a_individual"].comparacao.q_fixa,30.125)
+        self.assertFalse(at.exception)
+
+    def test_confirmacao_cancelamento_e_restauracao_somente_atual(self):
+        at=interface()
+        por_rotulo(at.sidebar.button,"Fixar cenário de referência").click().run()
+        e=at.session_state["m02_a_individual"]
+        e.escolha=Escolha(ParametrosFirma(cf=100),25)
+        at.run()
+        original=e.comparacao.referencia
+        por_rotulo(at.sidebar.button,"Substituir referência").click().run()
+        self.assertTrue(at.session_state["m02_a_individual"].comparacao.substituindo)
+        por_rotulo(at.sidebar.button,"Cancelar substituição").click().run()
+        self.assertEqual(at.session_state["m02_a_individual"].comparacao.referencia,original)
+        por_rotulo(at.sidebar.button,"Substituir referência").click().run()
+        por_rotulo(at.sidebar.button,"Confirmar substituição").click().run()
+        self.assertEqual(at.session_state["m02_a_individual"].comparacao.referencia.cf,100)
+        por_rotulo(at.sidebar.button,"Restaurar parâmetros do Atual").click().run()
+        self.assertEqual(at.session_state["m02_a_individual"].escolha.parametros.cf,0)
+        self.assertEqual(at.session_state["m02_a_individual"].comparacao.referencia.cf,100)
+        self.assertFalse(at.exception)
 
 
 class Marcadores(unittest.TestCase):

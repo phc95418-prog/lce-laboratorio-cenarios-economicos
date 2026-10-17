@@ -64,7 +64,6 @@ def renderizar_individual():
         ("Restaurar experimento",restaurar,"Reinicia parâmetros, Q, perspectivas, ótimos e aprofundamentos."),
         ("Fixar cenário de referência",fixar,"Congela os parâmetros atuais e inicia uma comparação controlada."),
     ]
-    lateral(estado,acoes)
 
     def parametros():
         with st.expander("Parâmetros de demanda", key=chave("demanda"), on_change="rerun"):
@@ -76,11 +75,11 @@ def renderizar_individual():
             controle(estado,"cf","CF · custo fixo inevitável (u.m.)")
 
     if estado.comparacao is not None:
-        # Fase A: a comparação mantém sua organização e controles aprovados.
-        parametros()
         from .interface_comparacao import renderizar_comparacao
-        renderizar_comparacao(estado, CONTROLE)
+        renderizar_comparacao(estado, CONTROLE, parametros)
         return
+
+    lateral(estado,acoes)
 
     def mudar_vista():
         if geracao == st.session_state.get("m02_a_geracao", 0):
