@@ -35,6 +35,15 @@ export async function renderizarVista(Plotly, plot, dados, layout, config) {
   await Plotly.relayout(plot,limites);
 }
 
+export async function redimensionarVisivel(Plotly, plot) {
+  if (!plot.isConnected || !plot.getClientRects().length) return;
+  try {await Plotly.Plots.resize(plot);}
+  catch (erro) {
+    // Uma saída de modo pode ocorrer entre a checagem e o resize assíncrono.
+    if (plot.isConnected && plot.getClientRects().length) throw erro;
+  }
+}
+
 export default function({parentElement, data}) {
   let root = parentElement.querySelector('.lce-pares');
   if (!root) {
@@ -127,9 +136,12 @@ export default function({parentElement, data}) {
     });
     observer = new ResizeObserver(entries => {
       const largura = entries[0].contentRect.width;
+      if (root.token !== token || !root.isConnected || !largura) return;
       root.dataset.disposicao = largura >= 1100 ? 'lado-a-lado' : 'empilhada';
       // Ambos recebem a mesma largura útil, inclusive quando empilhados.
-      for (const p of plots) Plotly.Plots.resize(p);
+      for (const p of plots) redimensionarVisivel(Plotly,p).catch(()=>{
+        if (root.token === token) status.textContent='Não foi possível ajustar o tamanho do gráfico. Use Restaurar visualização comparativa.';
+      });
     });
     observer.observe(root);
     // O tema nativo muda sem rerun Python. Ler apenas cores calculadas do DOM;

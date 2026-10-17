@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 const source = await readFile(new URL('./modulo_02/graficos_comparacao.js',import.meta.url),'utf8');
-const {limitesRelayout,aparenciaTema,vistasPreservadas,renderizarVista} = await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const {limitesRelayout,aparenciaTema,vistasPreservadas,renderizarVista,redimensionarVisivel} = await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 const base={xaxis:{range:[0,100]},yaxis:{range:[-8000,8000]}};
 const zoom={xaxis:{range:[70,90]},yaxis:{range:[2000,6000]}};
 test('arraste transfere exatamente ambos os eixos e não autorange',()=>{
@@ -70,4 +70,19 @@ test('restauração mantém snapshot de eixos quando Plotly.react muta layout',a
   await renderizarVista(plotly,{},[],layout,{});
   assert.deepEqual(aplicado['xaxis.range'],[0,100]);
   assert.deepEqual(aplicado['yaxis.range'],[-8000,8000]);
+});
+test('resize ignora gráficos desconectados ou ocultos, mas atende os visíveis',async()=>{
+  let chamadas=0;
+  const Plotly={Plots:{resize:async()=>{chamadas++;}}};
+  await redimensionarVisivel(Plotly,{isConnected:false,getClientRects:()=>[{}]});
+  await redimensionarVisivel(Plotly,{isConnected:true,getClientRects:()=>[]});
+  assert.equal(chamadas,0);
+  await redimensionarVisivel(Plotly,{isConnected:true,getClientRects:()=>[{}]});
+  assert.equal(chamadas,1);
+});
+test('saída durante resize não vaza rejeição e erro em gráfico visível é reportável',async()=>{
+  const plot={isConnected:true,getClientRects:()=>[{}]};
+  await redimensionarVisivel({Plots:{resize:async()=>{plot.isConnected=false;throw Error('oculto');}}},plot);
+  plot.isConnected=true;
+  await assert.rejects(redimensionarVisivel({Plots:{resize:async()=>{throw Error('falha real');}}},plot),/falha real/);
 });

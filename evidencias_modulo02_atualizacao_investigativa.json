@@ -68,6 +68,11 @@
       "id": "INT-04/05",
       "resultado": "APROVADO",
       "evidencia": "Desktop 1280×900 com dois gráficos lado a lado; tablet 768×900 com análise matemática legível e documento de largura 768. Teste de integração confirma que alternar zoom não modifica o estado econômico. Análise e configurações preservam arquitetura de estados existente."
+    },
+    {
+      "id": "INT-04-ciclo-resize",
+      "resultado": "APROVADO",
+      "evidencia": "Checagem final revelou rejeição de resize ao remover gráficos na saída da comparação. Proteção passou a ignorar gráficos ocultos/desconectados e tratar saída durante resize assíncrono. Dois testes novos cobrem ciclo e erro real. Nova aba com versão recarregada: abrir e encerrar comparação, retornar individual; console sem erros na consulta final."
     }
   ],
   "testes": {
@@ -81,10 +86,10 @@
     "testar_modulo02_visual.py": 10,
     "testar_modulo02_analise.py": 16,
     "testar_modulo02_controles.mjs": 9,
-    "testar_modulo02_graficos_comparacao.mjs": 13,
+    "testar_modulo02_graficos_comparacao.mjs": 15,
     "testar_modulo02_configuracoes.mjs": 3,
-    "total": 198,
-    "aprovados": 198,
+    "total": 200,
+    "aprovados": 200,
     "falhas": 0,
     "erros": 0,
     "ignorados": 0
