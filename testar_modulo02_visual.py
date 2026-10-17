@@ -12,7 +12,7 @@ from modulo_02.graficos_individual import grafico_individual
 def interface():
     # Cada AppTest cria um Runtime isolado; registros V2 de outro Runtime
     # não sobrevivem, embora o cache de módulos Python sobreviva no teste.
-    for nome in ("modulo_02.interface_individual","modulo_02.interface_comparacao","modulo_02.estrutura_visual"):
+    for nome in ("modulo_02.interface_individual","modulo_02.interface_comparacao","modulo_02.interface_b","modulo_02.estrutura_visual"):
         sys.modules.pop(nome,None)
     return AppTest.from_file("lce_modulo02.py",default_timeout=15).run()
 

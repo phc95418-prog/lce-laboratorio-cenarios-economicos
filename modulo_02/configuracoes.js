@@ -40,7 +40,7 @@ export default function({parentElement,data}) {
   for(const b of root.querySelectorAll('[data-tema]')) b.onclick=()=>aplicar(b.dataset.tema,b.textContent);
   const alvos=data.comparacao ? [
     ['Referência','.lce-pares .referencia'],['Atual','.lce-pares .atual'],
-  ] : [['Individual','[data-testid="stPlotlyChart"]']];
+  ] : [[data.experimento==='B'?'Experimento B':'Individual','[data-testid="stPlotlyChart"]']];
   for(const [nome,seletor] of alvos) {
     const b=document.createElement('button');b.type='button';b.textContent='Exportar '+nome+' · PNG';
     b.onclick=()=>{

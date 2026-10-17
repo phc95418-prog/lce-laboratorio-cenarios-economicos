@@ -14,18 +14,22 @@ CONFIGURACOES = st.components.v2.component(
     css=Path(__file__).with_name("configuracoes.css").read_text(encoding="utf-8"),
 )
 
-def cabecalho(modo):
+def cabecalho(modo, *, experimento="A"):
     with st.container(horizontal=True, vertical_alignment="center", gap="small"):
         with st.container():
             st.caption("LCE · LABORATÓRIO DE CENÁRIOS ECONÔMICOS")
             st.subheader("Módulo 02 · Decisões da Firma", anchor=False)
-            st.caption("Experimento A · "+modo)
+            st.caption("Experimento "+experimento+" · "+modo)
         with st.popover("Configurações", icon=":material/settings:", key="m02_configuracoes"):
             with st.container(width=380,height=420,border=False):
-                CONFIGURACOES(key="m02_configuracoes_reais",data={"comparacao":modo=="Comparação controlada"})
+                CONFIGURACOES(key="m02_configuracoes_reais",data={"comparacao":modo=="Comparação controlada","experimento":experimento})
                 with st.expander("Sobre o modelo"):
-                    st.write("Firma monopolista teórica com demanda inversa linear e preço uniforme. Custo variável quadrático; CF é encargo fixo comprometido, inevitável no horizonte corrente. Não há entrada, saída ou decisão endógena de fechamento.")
-                    st.latex(r"0\leq Q\leq a/b,\quad a,b,s>0,\quad c,CF\geq0")
+                    if experimento=="A":
+                        st.write("Firma monopolista teórica com demanda inversa linear e preço uniforme. Custo variável quadrático; CF é encargo fixo comprometido, inevitável no horizonte corrente. Não há entrada, saída ou decisão endógena de fechamento.")
+                        st.latex(r"0\leq Q\leq a/b,\quad a,b,s>0,\quad c,CF\geq0")
+                    else:
+                        st.write("Concorrência perfeita e monopólio sob a mesma demanda e custos agregados equivalentes. Tecnologia, unidades produtivas e preços de insumos invariantes; custos variáveis separáveis. Concorrência pressupõe tomada de preço. Não há oligopólio, entrada, saída ou custos de reorganização. B tem somente a, b, c e s, sem CF.")
+                        st.latex(r"0\leq Q\leq a/b,\quad a,b,s>0,\quad c\geq0")
                     st.write("Q em unidades; preços e marginais em u.m./unidade; totais em u.m. hipotéticas. As simulações são condicionais às hipóteses, não previsões empíricas. A análise detalha a interpretação do custo de oportunidade.")
                     st.caption(f"Streamlit {st.__version__} · Plotly · motor econômico local com precisão interna não arredondada.")
                 st.caption("Aparência usa o seletor nativo; exportação usa o PNG do Plotly. Aba Ações na borda esquerda. Enter aciona controles; Escape fecha os painéis.")
@@ -74,10 +78,10 @@ def estilo_local():
     body:has(.st-key-m02_a_root) [data-testid="stExpandSidebarButton"]:focus-visible {
       outline:3px solid #3578c8;outline-offset:2px;}
     .st-key-m02_a_root [data-testid="stCaptionContainer"] {opacity:1;}
-    .st-key-m02_a_indicadores [data-testid="stMetric"] {
+    :is(.st-key-m02_a_indicadores,.st-key-m02_b_indicadores) [data-testid="stMetric"] {
       max-width:100%;border:1px solid #8290a0;
       border-radius:10px;padding:0.75rem;}
-    .st-key-m02_a_indicadores [data-testid="stMetricLabel"] p {white-space:normal;}
-    .st-key-m02_a_indicadores [data-testid="stMetricLabel"] {min-height:2.8rem;}
-    .st-key-m02_a_indicadores [data-testid="stMetricValue"] {font-size:1.5rem;white-space:normal;}
+    :is(.st-key-m02_a_indicadores,.st-key-m02_b_indicadores) [data-testid="stMetricLabel"] p {white-space:normal;}
+    :is(.st-key-m02_a_indicadores,.st-key-m02_b_indicadores) [data-testid="stMetricLabel"] {min-height:2.8rem;}
+    :is(.st-key-m02_a_indicadores,.st-key-m02_b_indicadores) [data-testid="stMetricValue"] {font-size:1.5rem;white-space:normal;}
     </style>""")
