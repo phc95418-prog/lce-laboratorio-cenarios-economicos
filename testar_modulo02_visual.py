@@ -22,6 +22,24 @@ def por_rotulo(elementos,rotulo):
 
 
 class IntegracaoVisual(unittest.TestCase):
+    def test_analise_opcional_sem_roteiro_e_zoom_nao_altera_economia(self):
+        at=interface()
+        self.assertNotIn("Ideias para investigar · opcional",[e.label for e in at.expander])
+        self.assertNotIn("Compreenda o mecanismo · opcional",[e.label for e in at.expander])
+        self.assertFalse(por_rotulo(at.expander,"Análise econômica e matemática").proto.expanded)
+        self.assertEqual([t.label for t in at.tabs],
+                         ["Leitura econômica","Estrutura matemática","Propriedades e limites"])
+        por_rotulo(at.sidebar.button,"Fixar cenário de referência").click().run()
+        antes=deepcopy(at.session_state["m02_a_individual"])
+        self.assertEqual(por_rotulo(at.radio,"Zoom comparativo").value,"Sincronizado")
+        por_rotulo(at.radio,"Zoom comparativo").set_value("Independente").run()
+        self.assertEqual(at.session_state["m02_a_individual"],antes)
+        por_rotulo(at.radio,"Zoom comparativo").set_value("Sincronizado").run()
+        self.assertEqual(at.session_state["m02_a_individual"],antes)
+        self.assertEqual([t.label for t in at.tabs],
+                         ["Leitura econômica","Estrutura matemática","Propriedades e limites"])
+        self.assertFalse(at.exception)
+
     def test_inicial_quatro_paineis_e_acoes_exclusivas_na_lateral(self):
         at=interface()
         self.assertFalse(at.exception)

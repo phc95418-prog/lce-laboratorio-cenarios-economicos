@@ -8,11 +8,9 @@ from .estado_comparacao import (
     PERSPECTIVAS, aplicar_quantidade, dominio_comum, encerrar_comparacao,
     restaurar_parametros, resultados_comparacao, substituir_referencia,
 )
-from .explicacoes_comparacao import sintese_comparacao, resumo_comparacao
-from .estado_individual import FOCOS, Escolha
-from .explicacoes_individual import (
-    numero, condicoes_excepcionais, GRUPOS_MATEMATICOS, IDEIAS,
-)
+from .explicacoes_comparacao import resumo_comparacao
+from .estado_individual import FOCOS
+from .explicacoes_individual import numero
 from .graficos_comparacao import graficos_comparacao
 from .estrutura_visual import lateral, ferramenta
 
@@ -93,12 +91,14 @@ def renderizar_comparacao(estado, componente_numero, parametros):
             st.radio("Foco dos dois gráficos",FOCOS,key=chave("foco"),
                      index=FOCOS.index(c.foco),on_change=foco)
             st.button("Restaurar visualização comparativa",on_click=agir,args=(restaurar,))
+            modo_zoom = st.radio("Zoom comparativo",("Sincronizado","Independente"),key=chave("modo_zoom"))
+            st.caption("Independente permite enquadramentos diferentes. Voltar a Sincronizado restaura a escala comum original.")
             roda = st.checkbox("Ativar zoom pela roda nos gráficos",key=chave("roda"))
-            st.caption("Arraste para ampliar; Pan move. Os dois gráficos mantêm o mesmo enquadramento. A roda é opcional para preservar a rolagem da página.")
-    st.caption("Referência congelada e Atual · mesmas escalas, curvas limitadas aos respectivos domínios econômicos.")
+            st.caption("Arraste para ampliar; Pan move. Sincronizado mantém o mesmo enquadramento; Independente permite vistas distintas. A roda é opcional para preservar a rolagem da página.")
+    st.caption("Zoom "+modo_zoom.lower()+" · "+("mesmas escalas" if modo_zoom=="Sincronizado" else "atenção: os enquadramentos podem diferir; comparação visual direta de escalas limitada")+" · curvas nos domínios próprios.")
     figuras, contexto = graficos_comparacao(estado)
     GRAFICOS(key=chave("graficos"),data={"figuras":[f.to_json() for f in figuras],
-                                     "contexto":contexto,"roda":roda})
+                                     "contexto":contexto,"roda":roda,"sincronizado":modo_zoom=="Sincronizado"})
 
     for mensagem in (estado.aviso_dominio,c.aviso):
         if mensagem:
@@ -120,20 +120,5 @@ def renderizar_comparacao(estado, componente_numero, parametros):
               "Atual":[numero(v[2]) for v in dados],"Δ Atual − Referência":[sinal(v[3]) for v in dados]})
     st.caption(f"Q individual preservada: {numero(estado.escolha.q)} unidades. Q fixa armazenada: {numero(c.q_fixa)} unidades.")
     st.info("Informação econômica: "+resumo_comparacao(estado),icon="ℹ️")
-    with st.expander("Compreenda o mecanismo · opcional"):
-        for titulo, resultado in (("Referência",r),("Atual",a)):
-            for aviso in condicoes_excepcionais(Escolha(resultado.parametros,resultado.curvas.q)):
-                st.write(f"{titulo}: {aviso}")
-        nivel = st.radio("Nível de explicação da comparação",("Essencial","Econômica","Matemática"),
-                         key=chave("nivel"),horizontal=True)
-        st.write(sintese_comparacao(estado))
-        if nivel != "Essencial":
-            st.write("Quantidade fixa isola a avaliação na mesma produção. Decisões ótimas compara cada cenário em seu próprio máximo de lucro, dadas as hipóteses linear-quadráticas e o custo fixo inevitável. Alterações conjuntas não permitem atribuir toda a diferença a um único parâmetro.")
-        if nivel == "Matemática":
-            for titulo, formula in GRUPOS_MATEMATICOS:
-                st.markdown(f"**{titulo}**")
-                st.latex(formula)
-            st.latex(r"\Delta X=X_{atual}-X_{ref},\quad Q_F\leq\min(a_{ref}/b_{ref},a_{atual}/b_{atual})")
-    with st.expander("Ideias para investigar · opcional"):
-        for ideia in IDEIAS:
-            st.write("• "+ideia)
+    from .interface_analise import renderizar_analise
+    renderizar_analise(estado,chave)

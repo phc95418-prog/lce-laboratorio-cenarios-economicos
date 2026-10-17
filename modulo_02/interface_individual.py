@@ -8,8 +8,7 @@ from .estado_individual import (
     selecionar_vista, revalidar_sessao, restaurar_experimento, alterar_zoom, chave_visualizacao,
 )
 from .explicacoes_individual import (
-    IDEIAS, condicoes_excepcionais, explicacao, numero, sintese, resumo_economico,
-    GRUPOS_MATEMATICOS, FORMULA_IGUALDADE, FORMULA_PROXIMIDADE, TEXTO_PRECISAO,
+    numero, resumo_economico,
 )
 from .estrutura_visual import cabecalho, lateral, ferramenta, estilo_local
 from .graficos_individual import grafico_individual
@@ -117,6 +116,7 @@ def renderizar_individual():
                     key=chave(f"grafico_{vista}_{estado.escolha.parametros}_{estado.zoom.get(vista,0)}"),
                     width="stretch", config={"displayModeBar":True,"displaylogo":False,
                     "responsive":True,"locale":"pt-BR","scrollZoom":st.session_state.get(chave("roda"),False),
+                    "toImageButtonOptions":{"filename":"lce-experimento-a-individual"},
                     "modeBarButtonsToRemove":["select2d","lasso2d","autoScale2d","zoomIn2d","zoomOut2d"]})
     st.caption("Arraste para ampliar; Pan desloca. Escala e roda em Visualização. Linhas por nomes e estilos; círculos indicam Q. Alterar a simulação ou a vista reinicia o enquadramento.")
     with st.container(horizontal=True):
@@ -151,27 +151,5 @@ def renderizar_individual():
         st.info("Informação econômica: " + resumo_economico(estado), icon="ℹ️")
     if estado.em_interacao:
         st.html('<p role="status" aria-live="polite">Atualizando gráfico e indicadores; síntese ao terminar.</p>')
-    with st.expander("Compreenda o mecanismo · opcional", key=chave("explicacao"), on_change="rerun"):
-        avisos = condicoes_excepcionais(estado.escolha)
-        if avisos:
-            st.markdown("**Condições econômicas atuais**")
-            for aviso in avisos:
-                st.write("• " + aviso)
-        if estado.aviso_dominio:
-            st.write("A ampliação posterior do domínio não restaura uma quantidade descartada pelo ajuste.")
-        st.markdown("**Leitura da última interação concluída**")
-        st.write(sintese(estado))
-        nivel = st.radio("Nível de explicação", ("Essencial","Econômica","Matemática"), horizontal=True, key=chave("nivel"))
-        st.write(explicacao(estado.confirmado, nivel))
-        if nivel == "Matemática":
-            for titulo, formula in GRUPOS_MATEMATICOS:
-                st.markdown(f"**{titulo}**")
-                st.latex(formula)
-            st.caption("A igualdade marginal na origem é uma condição de fronteira, não um ótimo interior.")
-            with st.expander("Precisão numérica e proximidade · detalhes", key=chave("precisao"), on_change="rerun"):
-                st.write(TEXTO_PRECISAO)
-                st.latex(FORMULA_IGUALDADE)
-                st.latex(FORMULA_PROXIMIDADE)
-    with st.expander("Ideias para investigar · opcional", key=chave("ideias"), on_change="rerun"):
-        for ideia in IDEIAS:
-            st.write("• " + ideia)
+    from .interface_analise import renderizar_analise
+    renderizar_analise(estado,chave)

@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 const source = await readFile(new URL('./modulo_02/graficos_comparacao.js',import.meta.url),'utf8');
-const {limitesRelayout,aparenciaTema} = await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const {limitesRelayout,aparenciaTema,vistasPreservadas,renderizarVista} = await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 const base={xaxis:{range:[0,100]},yaxis:{range:[-8000,8000]}};
 const zoom={xaxis:{range:[70,90]},yaxis:{range:[2000,6000]}};
 test('arraste transfere exatamente ambos os eixos e não autorange',()=>{
@@ -38,4 +38,36 @@ test('tema usa cores reais sem incluir alterações de escala ou domínio',()=>{
     assert.equal(t['font.color'],texto);
     assert.ok(Object.keys(t).every(k=>!/range|autorange|minallowed|maxallowed/.test(k)));
   }
+});
+test('sincronizado conserva a mesma vista ao renderizar novos resultados',()=>{
+  assert.deepEqual(vistasPreservadas('base','base',true,true,zoom,[null,null]),[zoom,zoom]);
+});
+test('entrada em independente parte do enquadramento compartilhado',()=>{
+  assert.deepEqual(vistasPreservadas('base','base',true,false,zoom,[null,null]),[zoom,zoom]);
+});
+test('independente preserva separadamente ambos os eixos de cada gráfico',()=>{
+  const a={xaxis:{range:[0,10]},yaxis:{range:[-20,20]}};
+  const b={xaxis:{range:[70,80]},yaxis:{range:[1000,2000]}};
+  assert.deepEqual(vistasPreservadas('base','base',false,false,null,[a,b]),[a,b]);
+});
+test('retorno ao sincronizado recupera a base comum original',()=>{
+  assert.deepEqual(vistasPreservadas('base','base',false,true,null,[zoom,base]),[null,null]);
+});
+test('mudança de domínio, foco ou restauração invalida enquadramentos antigos',()=>{
+  for(const modo of [true,false])
+    assert.deepEqual(vistasPreservadas('antiga','nova',modo,modo,zoom,[zoom,base]),[null,null]);
+});
+test('primeiro enquadramento é comum e sem resíduos de comparação anterior',()=>{
+  assert.deepEqual(vistasPreservadas(undefined,'nova',undefined,true,null,null),[null,null]);
+});
+test('restauração mantém snapshot de eixos quando Plotly.react muta layout',async()=>{
+  const layout={xaxis:{range:[0,100]},yaxis:{range:[-8000,8000]}};
+  let aplicado;
+  const plotly={
+    react:async(plot,dados,l)=>{l.xaxis.range[0]=20;l.xaxis.range[1]=50;l.yaxis.range=[0,1000];},
+    relayout:async(plot,limites)=>{aplicado=limites;},
+  };
+  await renderizarVista(plotly,{},[],layout,{});
+  assert.deepEqual(aplicado['xaxis.range'],[0,100]);
+  assert.deepEqual(aplicado['yaxis.range'],[-8000,8000]);
 });

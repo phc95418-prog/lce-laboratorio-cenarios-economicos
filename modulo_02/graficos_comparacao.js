@@ -21,6 +21,20 @@ export function aparenciaTema(fundo, texto) {
 
 const CORES_ESCURAS = {'#145da0':'#70b7ff','#a84b0a':'#ffba75','#087858':'#65d9af'};
 
+export function vistasPreservadas(contextoAntes, contextoAgora, antesSincrono, agoraSincrono, comum, individuais) {
+  // Retornar a Sincronizado ou restaurar/foco/parâmetros recupera a base comum.
+  if (contextoAntes !== contextoAgora || (!antesSincrono && agoraSincrono)) return [null,null];
+  return agoraSincrono || antesSincrono ? [comum,comum] : (individuais || [null,null]);
+}
+
+export async function renderizarVista(Plotly, plot, dados, layout, config) {
+  // react pode mutar seu argumento ao preservar uma vista pela uirevision.
+  // Snapshot anterior evita transformar a vista do usuário na base restaurada.
+  const limites = limitesRelayout({'xaxis.autorange':true},layout,layout);
+  await Plotly.react(plot,dados,layout,config);
+  await Plotly.relayout(plot,limites);
+}
+
 export default function({parentElement, data}) {
   let root = parentElement.querySelector('.lce-pares');
   if (!root) {
@@ -34,6 +48,9 @@ export default function({parentElement, data}) {
   }
   const token = {};
   root.token = token;
+  const sincronizado = data.sincronizado !== false;
+  root.setAttribute('aria-label',sincronizado ? 'Gráficos comparativos com escalas sincronizadas' :
+    'Gráficos comparativos com enquadramentos independentes');
   const plots = [root.querySelector('.referencia'),root.querySelector('.atual')];
   const status = root.querySelector('.situacao');
   const figures = data.figuras.map(f => JSON.parse(f));
@@ -65,33 +82,42 @@ export default function({parentElement, data}) {
   root.work = (root.work || Promise.resolve()).then(async () => {
     if (root.token !== token) return;
     root.syncing = true;
-    const preservar = root.contexto === data.contexto && root.limites;
+    const preservar = vistasPreservadas(root.contexto,data.contexto,root.sincronizado,
+      sincronizado,root.limites,root.individuais);
     const config = {displaylogo:false, responsive:true, scrollZoom:data.roda,
       displayModeBar:true, doubleClick:'reset',
       modeBarButtonsToRemove:['select2d','lasso2d','zoomIn2d','zoomOut2d','autoScale2d']};
     for (let i=0;i<2;i++) {
-      const layout = {...figures[i].layout, autosize:true};
-      if (preservar) {
-        layout.xaxis = {...layout.xaxis,range:[...root.limites['xaxis.range']],autorange:false};
-        layout.yaxis = {...layout.yaxis,range:[...root.limites['yaxis.range']],autorange:false};
+      const layout = {...figures[i].layout, autosize:true,
+        uirevision:String(figures[i].layout.uirevision)+':'+sincronizado};
+      if (preservar[i]) {
+        layout.xaxis = {...layout.xaxis,range:[...preservar[i]['xaxis.range']],autorange:false};
+        layout.yaxis = {...layout.yaxis,range:[...preservar[i]['yaxis.range']],autorange:false};
       }
-      await Plotly.react(plots[i],figures[i].data,layout,config);
+      await renderizarVista(Plotly,plots[i],figures[i].data,layout,{...config,
+        toImageButtonOptions:{filename:i===0?'lce-experimento-a-referencia':'lce-experimento-a-atual'}});
     }
     if (root.token !== token) return;
-    if (!preservar) root.limites = null;
+    root.limites = sincronizado ? preservar[0] : null;
+    root.individuais = [...preservar];
+    root.sincronizado = sincronizado;
     root.contexto = data.contexto;
     await colorir(tema);
     root.syncing = false;
-    plots.forEach(plot => {
+    plots.forEach((plot,indice) => {
       const handler = async evento => {
         if (root.syncing || root.token !== token) return;
-        const limites = limitesRelayout(evento,plot.layout,figures[0].layout);
+        const limites = limitesRelayout(evento,plot.layout,figures[indice].layout);
         if (!limites) return;
         root.syncing = true;
-        root.limites = limites;
+        if (sincronizado) {
+          root.limites = limites;
+          root.individuais = [limites,limites];
+        } else root.individuais[indice] = limites;
         try {
-          await Promise.all(plots.map(p => Plotly.relayout(p,limites)));
-          status.textContent = 'Visualização sincronizada nos dois cenários.';
+          await Promise.all((sincronizado ? plots : [plot]).map(p => Plotly.relayout(p,limites)));
+          status.textContent = sincronizado ? 'Visualização sincronizada nos dois cenários.' :
+            'Zoom independente: enquadramentos podem diferir. As escalas visuais não são diretamente comparáveis.';
         } catch (_) {
           status.textContent = 'Não foi possível sincronizar. Use Restaurar visualização comparativa.';
         } finally {root.syncing = false;}
@@ -115,7 +141,8 @@ export default function({parentElement, data}) {
       root.work = root.work.then(()=>root.token===token ? colorir(novo) : undefined);
     });
     temaObserver.observe(app,{attributes:true,attributeFilter:['class','style']});
-    status.textContent = 'Mesmas escalas; zoom e deslocamento sincronizados. As curvas respeitam seus domínios próprios.';
+    status.textContent = sincronizado ? 'Mesmas escalas; zoom e deslocamento sincronizados. As curvas respeitam seus domínios próprios.' :
+      'Zoom independente: enquadramentos podem diferir. As escalas visuais não são diretamente comparáveis.';
   }).catch(() => {
     status.textContent = 'Não foi possível renderizar os gráficos comparativos. Recarregue a página.';
     root.syncing = false;

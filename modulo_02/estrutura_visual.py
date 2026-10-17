@@ -8,6 +8,11 @@ ACIONADOR = st.components.v2.component(
     "lce_m02_acoes", isolate_styles=False,
     js=Path(__file__).with_name("acionador_lateral.js").read_text(encoding="utf-8"),
 )
+CONFIGURACOES = st.components.v2.component(
+    "lce_m02_configuracoes",
+    js=Path(__file__).with_name("configuracoes.js").read_text(encoding="utf-8"),
+    css=Path(__file__).with_name("configuracoes.css").read_text(encoding="utf-8"),
+)
 
 def cabecalho(modo):
     with st.container(horizontal=True, vertical_alignment="center", gap="small"):
@@ -16,10 +21,14 @@ def cabecalho(modo):
             st.subheader("Módulo 02 · Decisões da Firma", anchor=False)
             st.caption("Experimento A · "+modo)
         with st.popover("Configurações", icon=":material/settings:", key="m02_configuracoes"):
-            st.markdown("**Tema claro ou escuro**")
-            st.write("Use o menu ⋮ no canto superior direito → Theme → Light (claro) ou Dark (escuro). O seletor nativo aplica o tema à interface inteira.")
-            st.caption("Os marcadores usam forma e contorno, além da cor, nos dois temas.")
-            st.caption("Aba Ações na borda esquerda. Enter abre ferramentas; Escape fecha os painéis flutuantes.")
+            with st.container(width=380,height=420,border=False):
+                CONFIGURACOES(key="m02_configuracoes_reais",data={"comparacao":modo=="Comparação controlada"})
+                with st.expander("Sobre o modelo"):
+                    st.write("Firma monopolista teórica com demanda inversa linear e preço uniforme. Custo variável quadrático; CF é encargo fixo comprometido, inevitável no horizonte corrente. Não há entrada, saída ou decisão endógena de fechamento.")
+                    st.latex(r"0\leq Q\leq a/b,\quad a,b,s>0,\quad c,CF\geq0")
+                    st.write("Q em unidades; preços e marginais em u.m./unidade; totais em u.m. hipotéticas. As simulações são condicionais às hipóteses, não previsões empíricas. A análise detalha a interpretação do custo de oportunidade.")
+                    st.caption(f"Streamlit {st.__version__} · Plotly · motor econômico local com precisão interna não arredondada.")
+                st.caption("Aparência usa o seletor nativo; exportação usa o PNG do Plotly. Aba Ações na borda esquerda. Enter aciona controles; Escape fecha os painéis.")
 
 
 def lateral(estado, acoes, *, complemento=None, resumo=None):
