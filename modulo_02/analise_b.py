@@ -4,6 +4,7 @@ from .estado_b import MODOS, regiao_ativa
 from .explicacoes_individual import numero
 from .analise_experimento_a import assinado, DIMENSOES, _latex
 from .graficos_b import NOMES
+from .formatacao_matematica import paragrafo, latex_operadores
 
 
 def valor_regiao(e,r):
@@ -49,9 +50,12 @@ def analise_b(e):
                      ("Perda e decomposição",r"\begin{aligned}\Delta Q_+&=Q_C-Q_M\\DWL&=\int_{Q_M}^{Q_C}[P_D(x)-CMg(x)]dx\\&=\frac{b+s}{2}(\Delta Q_+)^2=L_C+L_P\\T&=(P_M-P_C)Q_M\quad(a>c)\\L_C&=\frac b2(\Delta Q_+)^2,\quad L_P=\frac s2(\Delta Q_+)^2\\\Delta EC&=-T-L_C,\quad\Delta EP=T-L_P\\\Delta ET&=-DWL\end{aligned}")]
         propriedades += [
             "EC mede excedente dos consumidores ao preço uniforme; EP é receita menos custo variável, não automaticamente lucro líquido de encargos fixos. B não contém controle de CF.",
+            f"Sob custos fixos agregados idênticos nos dois regimes, a diferença de lucro econômico líquido coincide com a de excedente do produtor: Π_M−Π_C=EP_M−EP_C={assinado(r.diferencas.excedente_produtor.absoluta)} u.m. Isso não iguala seus níveis nem é previsão sobre mercados reais.",
             "ET é excedente monetário agregado, com igual peso por unidade monetária. Sua interpretação como bem-estar requer hipóteses como preferências quase lineares, ausência de efeitos-renda relevantes e custos de oportunidade pertinentes. Não mede equidade.",
             "O gráfico destaca uma única região; o balanço numérico não implica sobreposição das áreas. Ao alternar regime com parâmetros fixos, os eixos são preservados.",
         ]
+        formulas.append(("Lucro e excedente — somente sob encargos fixos agregados idênticos",
+            r"\Pi_M-\Pi_C=EP_M-EP_C\quad(F_M=F_C)"))
     if p.a>p.c:
         propriedades.append("a>c: 0<Q_M<Q_C, P_M>P_C. A quantidade competitiva maximiza o excedente monetário neste modelo; isso não é uma conclusão distributiva universal.")
     else:
@@ -66,12 +70,15 @@ def analise_b(e):
 
 def renderizar_analise_b(e,chave):
     import streamlit as st
-    dados=analise_b(e)
     with st.expander("Análise econômica e matemática",key=chave("analise")):
+        if e.em_interacao:
+            st.info("Gráficos e indicadores acompanham a interação. A análise será consolidada ao concluir; o texto anterior fica suspenso.",icon="ℹ️")
+            return
+        dados=analise_b(e)
         st.caption("Três dimensões opcionais. Conteúdo consolidado ao término da interação, sobre valores internos confirmados.")
         for aba,campo in zip(st.tabs(DIMENSOES),("leitura","formulas","propriedades")):
             with aba:
                 for item in dados[campo]:
                     if campo=="formulas":
-                        st.markdown("**"+item[0]+"**");st.latex(item[1])
-                    else: st.write(item)
+                        st.markdown("**"+item[0]+"**");st.latex(latex_operadores(item[1]))
+                    else: paragrafo(item)

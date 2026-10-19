@@ -12,7 +12,7 @@ from modulo_02.graficos_individual import grafico_individual
 def interface():
     # Cada AppTest cria um Runtime isolado; registros V2 de outro Runtime
     # não sobrevivem, embora o cache de módulos Python sobreviva no teste.
-    for nome in ("modulo_02.interface_individual","modulo_02.interface_comparacao","modulo_02.interface_b","modulo_02.estrutura_visual"):
+    for nome in ("modulo_02.interface_individual","modulo_02.interface_comparacao","modulo_02.interface_b","modulo_02.janela_variaveis","modulo_02.estrutura_visual"):
         sys.modules.pop(nome,None)
     return AppTest.from_file("lce_modulo02.py",default_timeout=15).run()
 
@@ -40,10 +40,10 @@ class IntegracaoVisual(unittest.TestCase):
                          ["Leitura econômica","Estrutura matemática","Propriedades e limites"])
         self.assertFalse(at.exception)
 
-    def test_inicial_cinco_paineis_e_acoes_exclusivas_na_lateral(self):
+    def test_inicial_quatro_paineis_e_janela_e_acoes_exclusivas_na_lateral(self):
         at=interface()
         self.assertFalse(at.exception)
-        self.assertEqual(len(at.get("popover")),5)
+        self.assertEqual(len(at.get("popover")),4)
         self.assertEqual([b.label for b in at.sidebar.button],
                          ["Restaurar experimento","Fixar cenário de referência"])
         self.assertEqual(len([b for b in at.button if b.label=="Fixar cenário de referência"]),1)
@@ -90,11 +90,11 @@ class IntegracaoVisual(unittest.TestCase):
         por_rotulo(at.radio,"Perspectiva comparativa").set_value("Decisões ótimas").run()
         self.assertEqual(at.session_state["m02_a_individual"].escolha,escolha)
         por_rotulo(at.button,"Encerrar comparação").click().run()
-        self.assertEqual(len(at.get("popover")),5)
+        self.assertEqual(len(at.get("popover")),4)
         self.assertEqual(por_rotulo(at.radio,"Perspectiva").value,"Análise Marginal")
         self.assertTrue(por_rotulo(at.checkbox,"Mostrar pontos ótimos").value)
 
-    def test_comparacao_cinco_paineis_acoes_na_lateral_e_q_independentes(self):
+    def test_comparacao_quatro_paineis_e_janela_acoes_na_lateral_e_q_independentes(self):
         at=interface()
         por_rotulo(at.sidebar.button,"Fixar cenário de referência").click().run()
         e=at.session_state["m02_a_individual"]
@@ -102,7 +102,7 @@ class IntegracaoVisual(unittest.TestCase):
         e.escolha=Escolha(ParametrosFirma(cf=100),25)
         antes=deepcopy(e)
         at.run()
-        self.assertEqual(len(at.get("popover")),5)
+        self.assertEqual(len(at.get("popover")),4)
         self.assertEqual([b.label for b in at.sidebar.button],
                          ["Substituir referência","Restaurar parâmetros do Atual","Encerrar comparação"])
         por_rotulo(at.radio,"Foco dos dois gráficos").set_value("Lucro").run()

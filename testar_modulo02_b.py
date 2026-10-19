@@ -183,9 +183,9 @@ class IntegracaoB(unittest.TestCase):
         at=interface();por_rotulo(at.segmented_control,"Experimento").set_value("Experimento B").run()
         self.assertFalse(at.exception)
         return at
-    def test_entrada_padrao_cinco_paineis_e_resultados(self):
+    def test_entrada_padrao_quatro_paineis_e_janela_e_resultados(self):
         at=self.b()
-        self.assertEqual(len(at.get("popover")),5)
+        self.assertEqual(len(at.get("popover")),4)
         self.assertEqual([m.value for m in at.metric],["40,00","60,00","26,67","73,33"])
         self.assertEqual(por_rotulo(at.radio,"Modo do Experimento B").value,MODOS[0])
         self.assertNotIn("Regime para a região",[x.label for x in at.radio])

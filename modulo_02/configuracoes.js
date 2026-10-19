@@ -5,7 +5,13 @@ export function opcaoAparencia(elementos, modo) {
   return [...elementos].find(el=>nomes[modo]?.some(nome=>el.textContent.trim().endsWith(nome)));
 }
 
-export default function({parentElement,data}) {
+export function svgDoDataURL(uri) {
+  if(!uri.startsWith('data:image/svg+xml')) throw new Error('O Plotly não retornou SVG.');
+  const [cabecalho,...partes]=uri.split(',');const conteudo=partes.join(',');
+  return cabecalho.includes(';base64')?new TextDecoder().decode(Uint8Array.from(atob(conteudo),c=>c.charCodeAt(0))):decodeURIComponent(conteudo);
+}
+
+export default function({parentElement,data,setStateValue}) {
   let root = parentElement.querySelector('.lce-configuracoes');
   if (!root) {
     root = document.createElement('section');root.className='lce-configuracoes';
@@ -39,9 +45,9 @@ export default function({parentElement,data}) {
   }
   for(const b of root.querySelectorAll('[data-tema]')) b.onclick=()=>aplicar(b.dataset.tema,b.textContent);
   const alvos=data.comparacao ? [
-    ['Referência','.lce-pares .referencia'],['Atual','.lce-pares .atual'],
-  ] : [[data.experimento==='B'?'Experimento B':'Individual','[data-testid="stPlotlyChart"]']];
-  for(const [nome,seletor] of alvos) {
+    ['Referência','.lce-pares .referencia','lce-experimento-a-referencia'],['Atual','.lce-pares .atual','lce-experimento-a-atual'],
+  ] : [[data.experimento==='B'?'Experimento B':'Individual','[data-testid="stPlotlyChart"]',data.experimento==='B'?'lce-experimento-b':'lce-experimento-a-individual']];
+  for(const [nome,seletor,arquivo] of alvos) {
     const b=document.createElement('button');b.type='button';b.textContent='Exportar '+nome+' · PNG';
     b.onclick=()=>{
       const grafico=document.querySelector(seletor);
@@ -50,6 +56,34 @@ export default function({parentElement,data}) {
       comando.click();status.textContent='Exportação de '+nome+' solicitada ao Plotly. Verifique o arquivo nos downloads do navegador.';
     };
     root.querySelector('.exportar').appendChild(b);
+    for(const formato of ['SVG','PDF']) {
+      const botao=document.createElement('button');botao.type='button';
+      botao.textContent=(formato==='PDF'?'Preparar ':'Exportar ')+nome+' · '+formato;
+      botao.disabled=data.interacao || (formato==='PDF'&&!data.pdf_disponivel);
+      botao.onclick=async()=>{
+        botao.disabled=true;
+        try {
+          const container=document.querySelector(seletor);
+          const plot=container?.matches('.js-plotly-plot')?container:container?.querySelector('.js-plotly-plot');
+          if(!plot) throw new Error('Aguarde o gráfico terminar de renderizar.');
+          const svg=svgDoDataURL(await window.Plotly.toImage(plot,{format:'svg'}));
+          if(formato==='SVG') {
+            const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
+            const link=document.createElement('a');link.href=url;link.download=arquivo+'.svg';link.click();
+            setTimeout(()=>URL.revokeObjectURL(url),1000);
+            status.textContent='Download SVG de '+nome+' solicitado. Verifique os downloads do navegador.';
+          } else {
+            root.seq=(root.seq||0)+1;
+            status.textContent='Preparando PDF de '+nome+'. Aguarde o botão Baixar PDF preparado.';
+            setStateValue('exportacao',{seq:root.seq,svg,arquivo,contexto:data.contexto});
+          }
+        } catch(erro) {status.textContent='Exportação não concluída: '+erro.message;}
+        finally {botao.disabled=false;}
+      };
+      root.querySelector('.exportar').appendChild(botao);
+    }
   }
+  if(data.pdf_pronto) status.textContent='PDF pronto: '+data.pdf_pronto+'. Use Baixar PDF preparado abaixo.';
+  if(!data.pdf_disponivel) status.textContent='PDF indisponível neste ambiente: requer Chrome/Chromium instalado no servidor. PNG e SVG permanecem disponíveis.';
   return encerrarEspera;
 }

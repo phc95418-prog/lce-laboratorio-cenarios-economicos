@@ -6,7 +6,7 @@ from .estado_b import (
     reiniciar_controles, restaurar_parametros_b, regiao_ativa,
 )
 from .estado_individual import LIMITES
-from .interface_individual import CONTROLE
+from .janela_variaveis import janela, campo as descritor, eventos
 from .estrutura_visual import cabecalho, ferramenta, lateral, barra_ferramentas
 from .textos_interface import REGIOES as ROTULOS_REGIOES, DESCRICOES
 from .estruturas_mercado import avaliar_mercados
@@ -47,27 +47,24 @@ def renderizar_b(*, acoes_cabecalho=None):
     lateral(e,[
         ("Utilizar parâmetros do Experimento A",importar,"Copia a, b, c e s do cenário Atual de A, sem CF ou sincronização."),
         ("Restaurar parâmetros do B",restaurar,"Recupera (100,1,20,1) e preserva modos e seleções."),
-    ],resumo=resumo)
-    def controle(campo):
-        k=chave(f"controle_{campo}_g{geracao}")
+    ],resumo=resumo,experimento="B")
+    def variaveis():
+        k=chave(f"janela_variaveis_g{geracao}")
         def receber():
             if geracao!=st.session_state.get("m02_b_geracao",0): return
             retorno=st.session_state.get(k)
-            aplicar_evento_b(atual(),campo,retorno.get("evento") if retorno else None)
-        minimo,maximo,passo=LIMITES[campo]
-        CONTROLE(key=k,on_evento_change=receber,data={"campo":"b_"+campo,"rotulo":ROTULOS[campo],
-            "minimo":minimo,"maximo":maximo,"passo":passo,"valor":getattr(e.parametros,campo),
-            "seq":e.sequencias.get(campo,0),"erro":e.erros.get(campo,"")})
+            for evento in eventos(retorno):
+                nome=evento.get("campo","")
+                aplicar_evento_b(atual(),nome.removeprefix("b_"),evento)
+        campos=[descritor("b_"+nome,ROTULOS[nome],getattr(e.parametros,nome),LIMITES[nome],
+            e.sequencias.get(nome,0),e.erros.get(nome,""),
+            "Parâmetros de demanda" if nome in ("a","b") else "Parâmetros de custos") for nome in CAMPOS]
+        janela(k,campos,receber,descricao="Os parâmetros afetam concorrência e monopólio simultaneamente. Enter ou perda de foco confirma o campo.")
     with barra_ferramentas():
         with ferramenta("Perspectivas",":material/view_carousel:",chave("ferramenta_perspectivas")):
             st.radio("Modo do Experimento B",MODOS,index=MODOS.index(e.modo),key=chave("modo"),
                 on_change=selecionar,args=("modo",chave("modo")))
-        with ferramenta("Alterar variáveis",":material/tune:",chave("ferramenta_variaveis"),variaveis=True):
-            st.caption("Cada parâmetro afeta concorrência e monopólio simultaneamente. Enter ou perda de foco confirma o campo.")
-            with st.expander("Parâmetros de demanda",key=chave("demanda")):
-                controle("a");controle("b")
-            with st.expander("Parâmetros de custos",key=chave("custos")):
-                controle("c");controle("s")
+        variaveis()
         with ferramenta("Visualização",":material/visibility:",chave("ferramenta_visualizacao")):
             st.button("Restaurar visualização",on_click=resetar_zoom,key=chave("restaurar_vista"))
             st.checkbox("Ativar zoom pela roda no gráfico",value=e.roda,key=chave("roda"),

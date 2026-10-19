@@ -1,5 +1,27 @@
 // Componente de produção: edição com buffer e eventos; cálculos só no Python.
-export default function(component) {
+// Agrupa eventos intermediários; primeiro valor e término não aguardam o limite.
+export function criarFilaLive(enviar, raf, cancelar, agora=()=>performance.now(), intervalo=50) {
+  let frame=null, pendente=null, ultimo=-Infinity;
+  const executar=()=>{
+    frame=null;
+    if (pendente === null) return;
+    if (agora()-ultimo<intervalo) {frame=raf(executar);return;}
+    const valor=pendente;pendente=null;ultimo=agora();enviar(valor);
+  };
+  return {
+    live(valor) {
+      if (!raf) {enviar(valor);return;}
+      pendente=valor;
+      if (agora()-ultimo>=intervalo) {
+        if(frame!==null) cancelar(frame);
+        executar();
+      } else if(frame===null) frame=raf(executar);
+    },
+    descartar() {if(frame!==null) cancelar(frame);frame=null;pendente=null;},
+  };
+}
+
+export function renderizarControle(component) {
   const {parentElement, data, setStateValue} = component;
   let root = parentElement.querySelector('.lce-controle');
   if (!root) {
@@ -67,6 +89,10 @@ export default function(component) {
     root.seq += 1;
     setStateValue('evento', {...payload, seq:root.seq});
   };
+  root.emitir=send;
+  if (!root.filaLive) root.filaLive=criarFilaLive(
+    p=>root.emitir(p),globalThis.requestAnimationFrame?.bind(globalThis),
+    globalThis.cancelAnimationFrame?.bind(globalThis));
   const live = () => {
     const valor = Math.min(data.maximo, Math.max(data.minimo,
       Number((Math.round(Number(range.value)/data.passo)*data.passo).toPrecision(15))));
@@ -77,18 +103,20 @@ export default function(component) {
     notice.textContent = '';
     input.setAttribute('aria-invalid','false');
     trace('live',valor);
-    send({fase:'live',valor});
+    root.filaLive.live({fase:'live',valor});
   };
   const finish = () => {
     if (!root.active && !root.keyboard) return;
     root.active = false;
     root.keyboard = false;
+    root.filaLive.descartar();
     trace('fim',root.value);
     send({fase:'fim',valor:root.value});
   };
   const commit = () => {
     if (!root.dirty) return;
     root.dirty = false;
+    root.filaLive.descartar();
     const texto = input.value.trim();
     const completo = /^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)(?:[eE][+-]?\d+)?$/.test(texto);
     const valor = completo ? Number(texto.replace(',', '.')) : NaN;
@@ -132,3 +160,5 @@ export default function(component) {
   root.detachHandlers = detach;
   return () => {detach(); if(root.detachHandlers === detach) root.detachHandlers = null;};
 }
+
+export default renderizarControle;

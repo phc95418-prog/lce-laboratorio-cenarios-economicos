@@ -1,0 +1,19 @@
+.lce-janela-raiz {font:inherit;color:var(--st-text-color);width:200px;max-width:100%;}
+.lce-janela-raiz button {font:inherit;color:inherit;cursor:pointer;}
+.lce-janela-raiz .abrir {width:100%;min-height:42px;border:1px solid #8290a0;border-radius:8px;
+  background:var(--st-background-color);font-weight:500;}
+.lce-janela-raiz .janela {position:fixed;z-index:1000;width:min(400px,calc(100vw - 16px));
+  max-height:calc(100dvh - 16px);border:1px solid #8290a0;border-radius:10px;
+  box-shadow:0 8px 28px #0004;background:var(--st-background-color);color:var(--st-text-color);overflow:hidden;}
+.lce-janela-raiz .janela[hidden] {display:none;}
+.lce-janela-raiz header {display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #8290a0;}
+.lce-janela-raiz .mover {flex:1;text-align:left;font-weight:600;cursor:move;touch-action:none;user-select:none;}
+.lce-janela-raiz header button {border:0;background:transparent;min-height:44px;padding:.5rem .8rem;}
+.lce-janela-raiz .fechar {font-size:1.5rem;}
+.lce-janela-raiz .corpo {max-height:calc(100dvh - 72px);overflow:auto;padding:.8rem;}
+.lce-janela-raiz p {font-size:.85rem;line-height:1.5;margin:0 0 .6rem;}
+.lce-janela-raiz details {margin:.6rem 0;border-top:1px solid #8290a0;padding-top:.5rem;}
+.lce-janela-raiz summary {font-weight:600;padding:.4rem 0;cursor:pointer;}
+.lce-janela-raiz [data-campo] {margin:.7rem 0;}
+.lce-janela-raiz button:focus-visible,.lce-janela-raiz summary:focus-visible {outline:3px solid var(--st-primary-color);outline-offset:-3px;}
+@media(max-width:600px) {.lce-janela-raiz .corpo {max-height:60dvh;}}

@@ -43,3 +43,26 @@ FAQ = (
     ("Como mudar a aparência ou exportar uma imagem?",
      "Abra Configurações para Sistema, Claro ou Escuro e para exportar PNG. Na comparação de A, escolha Referência ou Atual. A imagem é salva nos downloads do navegador. Aparência, Ajuda e exportação não alteram resultados ou referência."),
 )
+
+
+def perguntas_frequentes(experimento):
+    """Nove dúvidas de funcionamento, com conteúdo próprio do experimento ativo."""
+    graficos=FAQ[4]
+    indicadores=FAQ[7]
+    exportacao=(FAQ[8][0],"Abra Configurações para Sistema, Claro ou Escuro e para exportar PNG, SVG ou preparar PDF quando disponível. Na comparação de A, escolha Referência ou Atual. PDF é baixado após sua preparação; a imagem corresponde à vista capturada no pedido. Sobre o modelo está em Ações. Essas operações não alteram a investigação.")
+    controles=(FAQ[2][0],"Abra Alterar variáveis: a janela pode ser movida pela barra de título ou pelas setas com a barra em foco, sem fechar para acompanhar o gráfico. O campo confirma por Enter ou perda de foco; valores entre passos são aceitos e inválidos preservam o último válido. "+("A controla Q e cinco parâmetros; a comparação edita só o Atual." if experimento=="A" else "B ajusta a, b, c e s nos dois regimes; importar de A exclui CF e não cria sincronização."))
+    if experimento=="A":
+        especificas=(
+            ("Quais perspectivas estão disponíveis em A?","Na investigação individual: Resultados Totais e Análise Marginal. Na comparação: Quantidade fixa e Decisões ótimas. A mudança consulta os resultados sem substituir as quantidades armazenadas."),
+            ("Receita máxima e lucro máximo são a mesma coisa?","Não. $Q_R$ maximiza receita; $Q_M$ maximiza lucro. Mostrar pontos ótimos apenas os revela. Ir para lucro máximo altera explicitamente Q na investigação individual, com precisão interna completa."),
+            FAQ[5],
+            ("Como o custo fixo afeta o lucro?","O encargo fixo inevitável desloca custo total e lucro, sem mudar custo marginal ou quantidade ótima. Lucro negativo não implica fechamento automático; A não modela entrada, saída ou ativação."),
+        )
+    else:
+        especificas=(
+            ("Quais modos estão disponíveis em B?","Comparar resultados mostra concorrência e monopólio juntos. Entender o mecanismo distingue preço e condição marginal. Investigar o bem-estar destaca uma região econômica por vez, sob os mesmos quatro parâmetros."),
+            FAQ[6],
+            ("Excedente do produtor é o mesmo que lucro líquido?","Não: EP desconta os custos variáveis. Sob encargos fixos agregados idênticos, a diferença de lucros entre regimes coincide com a diferença de EP, sem igualar seus níveis. B não contém controle de custo fixo nem curva de lucro."),
+            ("O que significa ausência de comércio?","Quando a≤c, as quantidades de equilíbrio são zero e não há preços transacionados. Excedentes e perdas variáveis são zero; percentuais com base zero não se aplicam. Isso não prova equivalência geral entre as estruturas."),
+        )
+    return (FAQ[0],controles,*especificas,graficos,indicadores,exportacao)

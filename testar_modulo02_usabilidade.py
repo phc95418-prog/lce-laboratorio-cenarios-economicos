@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import streamlit as st
 from testar_modulo02_visual import interface, por_rotulo
-from modulo_02.textos_interface import FAQ, REGIOES
+from modulo_02.textos_interface import perguntas_frequentes, REGIOES
 from modulo_02.estado_b import MODOS
 
 
@@ -21,13 +21,13 @@ class Usabilidade(unittest.TestCase):
     def test_ajuda_opcional_compartilhada_nao_altera_a_ou_b(self):
         at=interface()
         antes=deepcopy(at.session_state["m02_a_individual"])
-        for pergunta,_ in FAQ:
+        for pergunta,_ in perguntas_frequentes("A"):
             self.assertFalse(por_rotulo(at.expander,pergunta).proto.expanded)
         at.run()
         self.assertEqual(at.session_state["m02_a_individual"],antes)
         at.segmented_control[0].set_value("Experimento B").run()
         antes_b=deepcopy(at.session_state["m02_b_estado"])
-        for pergunta,_ in FAQ:
+        for pergunta,_ in perguntas_frequentes("B"):
             self.assertFalse(por_rotulo(at.expander,pergunta).proto.expanded)
         at.run()
         self.assertEqual(at.session_state["m02_b_estado"],antes_b)

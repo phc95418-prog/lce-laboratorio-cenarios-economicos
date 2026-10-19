@@ -1,7 +1,7 @@
 """Renderização de A individual. Executar pelo ponto de entrada lce_modulo02.py."""
 
-from pathlib import Path
 import streamlit as st
+from .janela_variaveis import janela, campo as descritor, eventos
 
 from .estado_individual import (
     EstadoIndividual, FOCOS, LIMITES, PERSPECTIVAS, aplicar_evento_sessao, selecionar_otimo,
@@ -14,31 +14,37 @@ from .estrutura_visual import cabecalho, lateral, ferramenta, barra_ferramentas
 from .graficos_individual import grafico_individual
 from .modelo_firma import avaliar_firma
 
-PASTA = Path(__file__).parent
-# Registro único durante a importação, sem redefinir componente a cada rerun.
-CONTROLE = st.components.v2.component(
-    "lce_m02_numero",
-    js=PASTA.joinpath("controles_individual.js").read_text(encoding="utf-8"),
-    css=PASTA.joinpath("controles_individual.css").read_text(encoding="utf-8"),
-)
-
-
-def controle(estado, campo, rotulo):
-    p = estado.escolha.parametros
-    minimo, maximo, passo = (0, p.q_max, 0.1) if campo == "q" else LIMITES[campo]
-    geracao = st.session_state.get("m02_a_geracao", 0)
-    chave = f"m02_a_controle_{campo}_g{geracao}"
-
+def janela_a(estado,chave):
+    p=estado.escolha.parametros
+    geracao=st.session_state.get("m02_a_geracao",0)
+    ciclo=estado.ciclo_comparacao
+    c=estado.comparacao
+    campos=[]
+    if c is None:
+        campos.append(descritor("q","Quantidade produzida Q (unidades)",estado.escolha.q,
+            (0,p.q_max,.1),estado.sequencias.get("q",0),estado.erros.get("q","")))
+    elif c.perspectiva=="Quantidade fixa":
+        from .estado_comparacao import dominio_comum
+        campos.append(descritor("q_comparacao","Quantidade comum Q da comparação (unidades)",c.q_fixa,
+            (0,dominio_comum(estado),.1),c.sequencia,c.erro))
+    rotulos={"a":"a · intercepto da demanda (u.m./unidade)","b":"b · inclinação da demanda",
+             "c":"c · custo marginal inicial (u.m./unidade)","s":"s · inclinação do custo marginal",
+             "cf":"CF · custo fixo inevitável (u.m.)"}
+    for nome,rotulo in rotulos.items():
+        campos.append(descritor(nome,rotulo,getattr(p,nome),LIMITES[nome],estado.sequencias.get(nome,0),
+            estado.erros.get(nome,""),"Parâmetros de demanda" if nome in ("a","b") else "Parâmetros de custos"))
     def receber():
-        retorno = st.session_state.get(chave)
-        aplicar_evento_sessao(st.session_state, geracao, campo, retorno.get("evento") if retorno else None)
-
-    CONTROLE(
-        key=chave, on_evento_change=receber,
-        data={"campo":campo, "rotulo":rotulo, "minimo":minimo, "maximo":maximo,
-              "passo":passo, "valor":estado.escolha.q if campo == "q" else getattr(p,campo),
-              "seq":estado.sequencias.get(campo,0), "erro":estado.erros.get(campo,"")},
-    )
+        atual=st.session_state.m02_a_individual
+        if geracao!=st.session_state.get("m02_a_geracao",0) or atual.ciclo_comparacao!=ciclo or (atual.comparacao is None)!=(c is None): return
+        for evento in eventos(st.session_state.get(chave)):
+            if evento.get("campo")=="q_comparacao":
+                from .estado_comparacao import aplicar_quantidade
+                if aplicar_quantidade(atual,evento): atual.em_interacao=evento.get("fase")=="live"
+            else: aplicar_evento_sessao(st.session_state,geracao,evento.get("campo"),evento)
+    descricao=(f"Domínio de Q: 0 a {numero(p.q_max)}. " if c is None else
+        "Somente o Atual é editável; a Referência permanece congelada. "+
+        ("Quantidade fixa usa o domínio comum. " if c.perspectiva=="Quantidade fixa" else "Decisões ótimas consulta os máximos próprios, sem substituir quantidades armazenadas. "))
+    janela(chave,campos,receber,descricao=descricao+"Enter ou perda de foco confirma o campo; a precisão digitada é preservada.")
 
 
 def renderizar_individual(*, acoes_cabecalho=None):
@@ -63,18 +69,9 @@ def renderizar_individual(*, acoes_cabecalho=None):
         ("Fixar cenário de referência",fixar,"Congela os parâmetros atuais e inicia uma comparação controlada."),
     ]
 
-    def parametros():
-        with st.expander("Parâmetros de demanda", key=chave("demanda"), on_change="rerun"):
-            controle(estado,"a","a · intercepto da demanda (u.m./unidade)")
-            controle(estado,"b","b · inclinação da demanda")
-        with st.expander("Parâmetros de custos", key=chave("custos"), on_change="rerun"):
-            controle(estado,"c","c · custo marginal inicial (u.m./unidade)")
-            controle(estado,"s","s · inclinação do custo marginal")
-            controle(estado,"cf","CF · custo fixo inevitável (u.m.)")
-
     if estado.comparacao is not None:
         from .interface_comparacao import renderizar_comparacao
-        renderizar_comparacao(estado, CONTROLE, parametros)
+        renderizar_comparacao(estado, janela_a)
         return
 
     lateral(estado,acoes)
@@ -93,10 +90,7 @@ def renderizar_individual(*, acoes_cabecalho=None):
         with ferramenta("Perspectivas",":material/view_carousel:",chave("ferramenta_perspectivas")):
             st.radio("Perspectiva",PERSPECTIVAS,key=chave("perspectiva"),
                      index=PERSPECTIVAS.index(estado.perspectiva),on_change=mudar_vista)
-        with ferramenta("Alterar variáveis",":material/tune:",chave("ferramenta_variaveis"),variaveis=True):
-            controle(estado,"q","Quantidade produzida Q (unidades)")
-            st.caption(f"Domínio atual: 0 ≤ Q ≤ {numero(estado.escolha.parametros.q_max)}. Enter ou perda de foco confirma o campo; a precisão digitada é preservada.")
-            parametros()
+        janela_a(estado,chave("janela_variaveis"))
         with ferramenta("Visualização",":material/visibility:",chave("ferramenta_visualizacao")):
             if estado.perspectiva == PERSPECTIVAS[0]:
                 st.radio("Foco do gráfico",FOCOS,key=chave("foco"),on_change=mudar_foco,
@@ -147,7 +141,8 @@ def renderizar_individual(*, acoes_cabecalho=None):
         for rotulo, valor in indicadores:
             st.metric(rotulo, numero(valor), width=200)
     with st.container(key="m02_a_sintese"):
-        st.info("Informação econômica: " + resumo_economico(estado), icon="ℹ️")
+        if not estado.em_interacao:
+            st.info("Informação econômica: " + resumo_economico(estado), icon="ℹ️")
     if estado.em_interacao:
         st.html('<p role="status" aria-live="polite">Atualizando gráfico e indicadores; síntese ao terminar.</p>')
     from .interface_analise import renderizar_analise
