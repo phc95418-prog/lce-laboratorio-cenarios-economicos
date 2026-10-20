@@ -1,4 +1,4 @@
-# Versoes usadas como referencia na primeira publicacao do LCE.
-# Escolha Python 3.13 em Streamlit Community Cloud > Advanced settings.
+# Dependencias da aplicacao integrada; usar Python 3.13 na hospedagem.
 streamlit==1.65.0
 plotly==6.9.0
+pandas==3.0.6
