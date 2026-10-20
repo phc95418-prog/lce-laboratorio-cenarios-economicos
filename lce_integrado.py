@@ -16,11 +16,8 @@ with st.container(gap="small", key="lce_navegacao_modulos"):
     st.page_link(modulo02, label=modulo02.title, width="stretch")
 
 # Escopo exclusivo do integrador. Os módulos independentes não recebem estilos
-# nem navegação adicionais. A área continua acessível durante a rolagem.
+# nem navegação adicionais. O seletor acompanha o fluxo natural da página.
 st.html("""<style>
-div:has(> .st-key-lce_navegacao_modulos) {
-  position:sticky;top:4rem;z-index:20;
-}
 .st-key-lce_navegacao_modulos {
   background:var(--background-color);border:1px solid #8290a0;
   border-radius:10px;padding:.5rem .75rem;
