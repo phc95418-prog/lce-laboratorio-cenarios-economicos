@@ -1,0 +1,106 @@
+{
+  "etapa": "Reorganização Visual — Fase B",
+  "branch": "feature/modulo-02",
+  "origem": "f973edbe6221f469101db1f169c88b43197d8d08",
+  "ambiente": {
+    "python": "3.13.16 (.venv)",
+    "streamlit": "1.65.0",
+    "url": "http://localhost:8503/",
+    "navegador": "integrado Codex"
+  },
+  "verificacoes": [
+    {
+      "id": "B01",
+      "resultado": "APROVADO",
+      "observado": "Comparação e individual usam cabeçalho e três ferramentas. Entrada por Fixar referência e retorno por Encerrar comparação efetivamente realizados."
+    },
+    {
+      "id": "B02",
+      "resultado": "APROVADO",
+      "observado": "Perspectivas, Alterar variáveis e Visualização abrem; Escape fecha. Enter abre o painel de variáveis no tablet."
+    },
+    {
+      "id": "B03",
+      "resultado": "APROVADO",
+      "observado": "Q fixa 30,125 confirmada por Enter; campo reexibe 30,125 após alternar perspectivas. Q individual permanece 25. CF=100 afeta apenas Atual; referência CF=0."
+    },
+    {
+      "id": "B04",
+      "resultado": "APROVADO",
+      "observado": "Quantidade fixa e Decisões ótimas alternadas. Decisões ótimas mostra Q=26,67 em ambos; RT=1.955,56; CT referência=888,89 e Atual=988,89; lucro=1.066,67 e 966,67."
+    },
+    {
+      "id": "B05",
+      "resultado": "APROVADO",
+      "observado": "Foco Lucro aplica-se aos dois gráficos; duas legendas Lucro observadas após terminar rerender; tabela econômica preservada."
+    },
+    {
+      "id": "B06",
+      "resultado": "APROVADO",
+      "observado": "Zoom real por arraste na Referência: ambos passam a ticks X 20/30/40/50 e Y -3000/-2000/-1000/0/1000. Pan no Atual move ambos: transform de X=20 de 155,92 para 235,92 nos dois gráficos. Restaurar visualização recupera X 0/20/40/60/80/100 em ambos."
+    },
+    {
+      "id": "B07",
+      "resultado": "APROVADO",
+      "observado": "Tema nativo System(claro) → Dark → System. Ambos os SVG de fundo passam a rgb(14,17,23) no escuro; curva e marcadores legíveis. Tema muda sem rerun Python."
+    },
+    {
+      "id": "B08",
+      "resultado": "APROVADO",
+      "observado": "Aba Ações com ícone, nome acessível Abrir ações do experimento. Abrir/fechar por clique e Enter nos dois modos. Posicionada a 10px do topo, fora dos gráficos."
+    },
+    {
+      "id": "B09",
+      "resultado": "APROVADO",
+      "observado": "Substituição abre confirmação na lateral; cancelamento e confirmação realizados. Após confirmar, referência CF=100; Restaurar parâmetros do Atual retorna CF atual a 0, mantendo referência CF=100 e quantidades."
+    },
+    {
+      "id": "B10",
+      "resultado": "APROVADO",
+      "observado": "Desktop 1440x900: área útil 1270px, dois gráficos lado a lado. Tablet 768x900: área útil 726px, gráficos empilhados, largura de documento 768px. Painel de variáveis utilizável e lateral abre por teclado."
+    },
+    {
+      "id": "B11",
+      "resultado": "APROVADO",
+      "observado": "Retorno individual preserva Q=25. Restaurar experimento recupera indicadores 25,00 / 75,00 / 1.875,00 / 812,50 / 1.062,50. Sem erros registrados no console consultado ao final."
+    }
+  ],
+  "testes": {
+    "testar_modelo.py": 10,
+    "testar_interface.py": 11,
+    "testar_investigacao.py": 20,
+    "testar_modulo02_modelo.py": 37,
+    "testar_modulo02_individual.py": 30,
+    "testar_modulo02_refinamentos.py": 14,
+    "testar_modulo02_comparacao.py": 25,
+    "testar_modulo02_visual.py": 9,
+    "testar_modulo02_controles.mjs": 9,
+    "testar_modulo02_graficos_comparacao.mjs": 6,
+    "total": 171,
+    "aprovados": 171,
+    "falhas": 0,
+    "erros": 0,
+    "ignorados": 0
+  },
+  "capturas": [
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-desktop-final.png",
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-escuro.png",
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-zoom-pan.png",
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-confirmacao.png",
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-tablet.png",
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-painel-tablet.png",
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-acoes-tablet.png",
+    "C:/Users/Jorge/.codex/visualizations/2026/10/13/01a1373f-58fc-76a0-8b55-7344f8b2d7e4/lce-fase-b-individual-tablet.png"
+  ],
+  "limites": [
+    "Toque real e zoom real do navegador a 200% continuam bloqueados pelas limitações já documentadas das ferramentas; não investigados novamente.",
+    "Auditoria WCAG completa permanece pendente para integração; teclado básico e nomes acessíveis foram verificados.",
+    "A adaptação mínima do acionador e a leitura de tema dependem de seletores data-testid do Streamlit 1.65; revalidar ao atualizar o framework. Handlers nativos de abertura/fechamento são preservados.",
+    "Arraste da lateral não implementado: opcional; clique e teclado atendem ao requisito.",
+    "Capturas podem apresentar menor nitidez devido à ferramenta; medidas DOM e interações foram registradas separadamente."
+  ],
+  "preservacao": [
+    "Sem mudanças no motor econômico, estados econômicos, Módulo 01 ou dependências.",
+    "Sem push, merge, PR ou deploy. Documentos não versionados e provas anteriores preservados."
+  ]
+}

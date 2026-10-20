@@ -1,0 +1,13 @@
+.lce-controle {font-family:inherit;color:inherit;min-width:0;}
+.lce-controle .rotulo {display:block;font-size:0.95rem;font-weight:600;line-height:1.4;}
+.lce-controle .entradas {display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;}
+.lce-controle input {box-sizing:border-box;min-height:44px;font:inherit;max-width:100%;}
+.lce-controle .slider {flex:2 1 100px;width:100px;accent-color:#145da0;cursor:pointer;}
+.lce-controle .campo {flex:1 1 13rem;width:13rem;min-width:0;border:1px solid #64748b;
+  border-radius:6px;padding:8px;color:inherit;background:transparent;}
+.lce-controle input:focus-visible {outline:3px solid #145da0;outline-offset:3px;}
+.lce-controle .aviso {font-size:0.875rem;line-height:1.4;margin:0;overflow-wrap:anywhere;}
+.lce-controle .aviso:not(:empty) {padding:0.6rem;border:1px solid #b91c1c;
+  border-radius:6px;background:#fef2f2;color:#991b1b;}
+.lce-controle input[aria-invalid="true"] {border:2px solid #b91c1c;}
+@media (prefers-reduced-motion: reduce) {.lce-controle * {animation:none;transition:none;}}

@@ -1,0 +1,7 @@
+.lce-configuracoes {font:inherit;color:var(--st-text-color);max-width:100%;}
+.lce-configuracoes p {margin:.5rem 0;line-height:1.5;}
+.lce-configuracoes .botoes {display:flex;gap:.5rem;flex-wrap:wrap;}
+.lce-configuracoes button {font:inherit;color:inherit;background:var(--st-background-color);
+  border:1px solid #8290a0;border-radius:8px;padding:.5rem .75rem;cursor:pointer;}
+.lce-configuracoes button:focus-visible {outline:3px solid var(--st-primary-color);outline-offset:2px;}
+.lce-configuracoes .status {font-size:.875rem;}

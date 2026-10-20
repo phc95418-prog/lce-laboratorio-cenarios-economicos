@@ -1,0 +1,164 @@
+{
+  "etapa": 3,
+  "data": "2026-10-16",
+  "branch": "feature/modulo-02",
+  "origem": "a3c2dfec72b13fe3e5de6c53b93040281406743c",
+  "url": "http://localhost:8503",
+  "ambiente": {
+    "python": "3.13.16 (.venv)",
+    "streamlit": "1.65.0",
+    "plotly": "6.9.0",
+    "navegador": "Codex In-app Browser"
+  },
+  "testes": {
+    "testar_modelo": 10,
+    "testar_interface": 11,
+    "testar_investigacao": 20,
+    "testar_modulo02_modelo": 37,
+    "testar_modulo02_individual": 30,
+    "testar_modulo02_refinamentos": 14,
+    "testar_modulo02_comparacao": 25,
+    "testar_modulo02_controles_js": 9,
+    "testar_modulo02_graficos_comparacao_js": 5,
+    "total": 161,
+    "aprovados": 161,
+    "falhas": 0,
+    "erros": 0,
+    "ignorados": 0
+  },
+  "matriz": [
+    {
+      "ids": "EV-04 / AC-01",
+      "entrada": "P=(100,1,20,1,0), QI=80",
+      "acao": "Fixar cenário de referência",
+      "esperado": "Cópia congelada de cinco parâmetros, Quantidade fixa, QF=80, QI=80",
+      "observado": "Quantidade fixa selecionada, QI=QF=80; alterações posteriores não mudaram a referência",
+      "evidencia": "Navegador: EV-04 no registro bruto; teste_ev04",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "EV-05 / CA-03",
+      "entrada": "QI=80, QF=80",
+      "acao": "Confirmar QF=55 por Enter",
+      "esperado": "Somente QF muda; QI=80",
+      "observado": "QI=80 e QF=55 exibidos; slider comparativo por teclado também alterou somente QF; 101 rejeitado com aviso vermelho",
+      "evidencia": "Navegador e testes de campos/precisão",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "EV-06 / G-05",
+      "entrada": "Referência padrão; Atual a=60,b=2; QI=30,QF=20",
+      "acao": "Alternar Decisões ótimas e Quantidade fixa",
+      "esperado": "QM_ref=80/3, QM_atual=8, sem substituir QI/QF ou trocar escalas",
+      "observado": "26,67 e 8,00 na tabela ótima; QI=30,QF=20 preservados; eixos comuns",
+      "evidencia": "EV-06_otimos_distintos no registro bruto e teste_g05",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "EV-07 / EV-08 / AT-08",
+      "entrada": "QI=80,QF=55, referência padrão",
+      "acao": "Atual a=60,b=2 e posterior restauração de a=100,b=1",
+      "esperado": "QI=QF=30 no domínio reduzido; expansão não recupera quantidades descartadas",
+      "observado": "Ambas limitadas a 30, avisos âmbar; QI permaneceu 30 após expansão e encerramento",
+      "evidencia": "EV-07_AT-08_clamp e EV-08_09_restauracao; testes_ev07_08 e ciclo_integral",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "EV-09 / AC-08",
+      "entrada": "Referência CF=400; Atual CF=400; QI=30,QF=20",
+      "acao": "Restaurar parâmetros padrão",
+      "esperado": "Referência CF=400 mantida, Atual CF=0; quantidades sem salto ao ótimo",
+      "observado": "ΔCT=-400 e Δlucro=+400; QI=30,QF=20 preservados",
+      "evidencia": "EV-09_ref400_preservada no registro bruto; teste_ev09",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "EV-10 / CA-01",
+      "entrada": "Referência CF=0; Atual CF=400; QI=30,QF=20",
+      "acao": "Pedir substituição, cancelar; pedir novamente e confirmar",
+      "esperado": "Cancelar não muda dados; confirmar copia somente referência e revalida QF",
+      "observado": "Cancelamento manteve Δlucro=-400; confirmação mostrou referência CF=400 e diferenças zero, quantidades preservadas",
+      "evidencia": "EV-10_cancelado e EV-10_confirmado; testes_ev10",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "EV-11 / AC-09",
+      "entrada": "QI=30,QF=20 após ciclo de restrição e substituição",
+      "acao": "Encerrar e iniciar outra comparação",
+      "esperado": "QI=30 e parâmetros atuais mantidos, referência anterior descartada; nova QF=30",
+      "observado": "Campo individual=30; nova comparação em Quantidade fixa e QF=30; botão Ir para lucro máximo ausente na comparação",
+      "evidencia": "Navegador: EV-11_reiniciar e leitura do campo individual; testes_ev11",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "AC-02 / AC-06 / G-02 / G-05 / V05",
+      "entrada": "Dois cenários, quatro focos; domínios 100 e 30",
+      "acao": "Gerar gráficos, ampliar Referência, deslocar Atual, restaurar por Enter",
+      "esperado": "Dois gráficos separados, mesmas escalas; zoom/pan sincronizados; curvas encerram no domínio próprio",
+      "observado": "Eixos de ambos passaram a Q=30/40/50/60 no zoom; Pan no Atual propagou limites; Enter restaurou 0/20/40/60/80/100 em ambos. Tabela econômica idêntica durante gestos. Domínios, focos e marcadores verificados em testes geométricos",
+      "evidencia": "zoom_referencia, pan_atual, zoom_final, restauracao_teclado_final; testes de gráficos e limitesRelayout",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "G-09 / aspectos novos de AT-11",
+      "entrada": "Viewports 1280, 1024 e 768 px",
+      "acao": "Redimensionar e observar gráficos pareados",
+      "esperado": "Lado a lado no desktop, empilhados no tablet, escalas e larguras úteis iguais",
+      "observado": "1280: painéis lado a lado com 547px cada; 1024 e 768: empilhados. Em 768: largura útil de eixos=612px em ambos, documentWidth=viewport=768",
+      "evidencia": "Medições DOM no navegador; capturas desktop/tablet. Capturas são parciais conforme rolagem; algumas capturas posteriores ao redimensionamento perderam nitidez na ferramenta",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "S-04 / S-07 (parte A)",
+      "entrada": "Individual marginal, ótimos revelados; comparação ativa",
+      "acao": "Encerrar comparação; recarregar a página em verificação separada",
+      "esperado": "Retorno conserva seleção marginal e ótimos; recarga reinicia Q=25 sem referência",
+      "observado": "Radio marginal e checkbox de ótimos permaneceram selecionados no retorno; recarga iniciou Q=25 e comando Fixar referência",
+      "evidencia": "Navegador e teste_encerrar_preserva_perspectiva_foco_e_otimos_individuais",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "S-05 / AC-10 / MSG-C01",
+      "entrada": "CF isolado; a e b conjuntos; CF=1600 com lucro negativo",
+      "acao": "Editar parâmetros e abrir Compreenda a comparação",
+      "esperado": "Base é referência congelada; efeito conjunto não é atribuído a CF; condição excepcional tem prioridade com síntese consultável",
+      "observado": "Texto conjunto para alterações de a/b; CF isolado corretamente identificado. Com CF1600, principal explicou receita inferior a CT sem fechamento; explicação de CF permaneceu no aprofundamento",
+      "evidencia": "Navegador final e testes de explicações/consolidação",
+      "resultado": "PASSOU"
+    },
+    {
+      "ids": "AT-11 completo",
+      "entrada": "Zoom real do navegador 200%, toque e WCAG completo",
+      "acao": "Não reabrir auditoria extensa nesta etapa",
+      "esperado": "Manter pendências previamente documentadas, sem declarar aceite completo",
+      "observado": "Não executados; limitações conhecidas preservadas",
+      "evidencia": "Limite expresso da tarefa",
+      "resultado": "BLOQUEADO"
+    }
+  ],
+  "limites": [
+    "Experimento B e navegação A-B não foram implementados nesta etapa.",
+    "Wheel comparativo é opcional e usa Plotly; a verificação focada de sincronização foi realizada por arraste, Pan e restauração.",
+    "v0.4 local consultada. ARQ-v0.3 e ECO-v0.2 não acessíveis pela ferramenta web; motor aprovado reutilizado sem alterações.",
+    "Nenhum limiar numérico de desempenho ou aceite WCAG completo foi presumido."
+  ],
+  "artefatos_externos": [
+    "lce-comparacao-desktop.jpg",
+    "lce-comparacao-tablet1024.jpg",
+    "lce-comparacao-tablet768.jpg",
+    "lce-comparacao-evidencias-brutas.json"
+  ],
+  "arquivos": [
+    "modulo_02/estado_comparacao.py",
+    "modulo_02/explicacoes_comparacao.py",
+    "modulo_02/graficos_comparacao.py",
+    "modulo_02/graficos_comparacao.js",
+    "modulo_02/graficos_comparacao.css",
+    "modulo_02/interface_comparacao.py",
+    "modulo_02/estado_individual.py",
+    "modulo_02/interface_individual.py",
+    "testar_modulo02_comparacao.py",
+    "testar_modulo02_graficos_comparacao.mjs",
+    "evidencias_modulo02_comparacao.json"
+  ]
+}

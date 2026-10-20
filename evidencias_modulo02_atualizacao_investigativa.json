@@ -1,0 +1,146 @@
+{
+  "etapa": "Atualização investigativa do Experimento A",
+  "branch": "feature/modulo-02",
+  "origem": "35cb192f669b85ea9b5d1c05bcb10f0ee703689d",
+  "referencias": {
+    "adendo_v01": "https://docs.google.com/document/d/1PUFZHTeJ3UqlJSPZMPfZYNTiYIRz9F9Pj6iIxx1u3Lo/edit",
+    "especificacao_v04": "https://docs.google.com/document/d/1fFHF0n2_es25pSIMlhXLcif-7S8YNZRtjIDc6_hYxaQ/edit",
+    "fundamentacao_v02": "https://docs.google.com/document/d/19RJRz6FSPTQW7hwx0RdOIc2yu43zeLbSRtV0DUQKjoA/edit"
+  },
+  "ambiente": {
+    "python": "3.13.16 (.venv)",
+    "streamlit": "1.65.0",
+    "url": "http://localhost:8503/",
+    "navegador": "integrado Codex"
+  },
+  "verificacoes": [
+    {
+      "id": "ANA-01/AC-ANA-01/02",
+      "resultado": "APROVADO",
+      "evidencia": "Análise econômica e matemática inicia recolhida (AppTest). Três abas independentes; abertura e alternância reais no navegador. Seções antigas não aparecem. Resultados permanecem preservados."
+    },
+    {
+      "id": "ANA-02/04",
+      "resultado": "APROVADO",
+      "evidencia": "Q=26,67 digitado: muito próximo, RMg−CMg=-0,01; RT=1.955,71, CT=889,04. Comando ótimo: RT=1.955,56, CT=888,89, classificação ótima, resíduo marginal -7,10543e−15 explicitado sem arredondar Q."
+    },
+    {
+      "id": "ANA-03",
+      "resultado": "APROVADO",
+      "evidencia": "LaTeX renderizado com coeficientes distintos de CF: referência CT=0+CV, atual CT=100+CV. Teste cobre coeficiente b=1,1537 sem arredondamento para 1,15."
+    },
+    {
+      "id": "ANA-05/06/11",
+      "resultado": "APROVADO",
+      "evidencia": "Testes determinísticos cobrem Q=0, Q=Qmax, a=c, a<c, Q_M minúsculo positivo, lucro negativo e CF inevitável; direção marginal admissível, fronteira e custo de oportunidade. Não foi repetida auditoria visual completa desses casos."
+    },
+    {
+      "id": "ANA-07/08/12",
+      "resultado": "APROVADO",
+      "evidencia": "Testes de CF/c isolados, mudanças simultâneas a/c/CF, demais sensibilidades condicionais e atualização live/fim individual e comparativa. Textos analíticos usam confirmado/q_confirmada; gráficos e indicadores mantêm estado imediato. Consolidação durante arraste foi verificada por testes de eventos, sem captura visual enquanto ponteiro permanece pressionado."
+    },
+    {
+      "id": "ANA-09/10/AC-ANA-04",
+      "resultado": "APROVADO",
+      "evidencia": "Navegador: QF=25, referência CF=0 e atual CF=100 → ΔCT=+100, Δπ=−100; Q_M inalterado. Depois c=30 isolado e Decisões ótimas: Q_M referência=26,67, atual=23,33; ΔRT=−166,67, ΔCT=+83,33, Δπ=−250,00 e ΔQ=−3,33. Texto distingue quantidades próprias de efeito a Q constante."
+    },
+    {
+      "id": "INT-01-aparencia",
+      "resultado": "APROVADO",
+      "evidencia": "Engrenagem aplica Escuro (fundo rgb(14,17,23)), Claro via Enter (rgb(255,255,255)) e Sistema; menu nativo confirmou System selecionado. Sem mudança dos indicadores. Sobre o modelo exibiu hipóteses, domínio, unidades e versão técnica."
+    },
+    {
+      "id": "INT-03-exportacao",
+      "resultado": "APROVADO",
+      "evidencia": "Downloads reais disparados pelos botões da engrenagem; PNG individual, Referência e Atual recuperados. Assinatura e dimensões verificadas. Inspeção visual dos arquivos individual e Atual confirmou curvas, eixos e unidades. Nenhuma exportação de relatório ou gravação."
+    },
+    {
+      "id": "INT-02-independente",
+      "resultado": "APROVADO",
+      "evidencia": "Arraste na Referência alterou somente seus eixos: X 20/30/40/50, Atual manteve 0/20/40/60/80/100. Pan da Referência mudou ticks/posições sem mudar Atual. Modo sinaliza possível diferença de escalas."
+    },
+    {
+      "id": "INT-02-retorno",
+      "resultado": "APROVADO",
+      "evidencia": "Retorno final ao Sincronizado: ambos X 0/20/40/60/80/100 e Y -8000/-6000/-4000/-2000/0/2000/4000/6000/8000. Novo zoom sincronizado alterou ambos para X 10/20/30/40/50. Bug de retenção pela uirevision corrigido por snapshot anterior a react e reaplicação dos limites; teste específico simula mutação do layout pelo Plotly."
+    },
+    {
+      "id": "INT-04/05",
+      "resultado": "APROVADO",
+      "evidencia": "Desktop 1280×900 com dois gráficos lado a lado; tablet 768×900 com análise matemática legível e documento de largura 768. Teste de integração confirma que alternar zoom não modifica o estado econômico. Análise e configurações preservam arquitetura de estados existente."
+    },
+    {
+      "id": "INT-04-ciclo-resize",
+      "resultado": "APROVADO",
+      "evidencia": "Checagem final revelou rejeição de resize ao remover gráficos na saída da comparação. Proteção passou a ignorar gráficos ocultos/desconectados e tratar saída durante resize assíncrono. Dois testes novos cobrem ciclo e erro real. Nova aba com versão recarregada: abrir e encerrar comparação, retornar individual; console sem erros na consulta final."
+    }
+  ],
+  "testes": {
+    "testar_modelo.py": 10,
+    "testar_interface.py": 11,
+    "testar_investigacao.py": 20,
+    "testar_modulo02_modelo.py": 37,
+    "testar_modulo02_individual.py": 30,
+    "testar_modulo02_refinamentos.py": 14,
+    "testar_modulo02_comparacao.py": 25,
+    "testar_modulo02_visual.py": 10,
+    "testar_modulo02_analise.py": 16,
+    "testar_modulo02_controles.mjs": 9,
+    "testar_modulo02_graficos_comparacao.mjs": 15,
+    "testar_modulo02_configuracoes.mjs": 3,
+    "total": 200,
+    "aprovados": 200,
+    "falhas": 0,
+    "erros": 0,
+    "ignorados": 0
+  },
+  "exportacoes_png": [
+    {
+      "arquivo": "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-experimento-a-individual.png",
+      "bytes": 42281,
+      "dimensoes": [
+        726,
+        420
+      ]
+    },
+    {
+      "arquivo": "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-experimento-a-referencia.png",
+      "bytes": 35164,
+      "dimensoes": [
+        545,
+        420
+      ]
+    },
+    {
+      "arquivo": "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-experimento-a-atual.png",
+      "bytes": 36800,
+      "dimensoes": [
+        545,
+        420
+      ]
+    }
+  ],
+  "capturas": [
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-configuracoes.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-zoom-independente.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-ressincronizado.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-analise-comparativa.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-matematica.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-otimos-distintos.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-individual.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-analise-final.png",
+    "C:\\Users\\Jorge\\.codex\\visualizations\\2026\\10\\13\\01a1373f-58fc-76a0-8b55-7344f8b2d7e4\\lce-investigativa-tablet-matematica.png"
+  ],
+  "limites": [
+    "Toque real, zoom real do navegador a 200% e auditoria WCAG completa continuam pendentes; não reinvestigados nesta tarefa.",
+    "Aparência delega cliques ao menu nativo do Streamlit; exportação delega ao controle PNG do Plotly. Adaptadores usam seletores semânticos/data-testid do Streamlit 1.65 e mensagens de indisponibilidade; revalidar após atualização do framework.",
+    "Arquivo PNG reproduz o enquadramento escolhido e as curvas/unidades; na comparação, o nome do arquivo identifica o cenário.",
+    "Servidor local reiniciado para carregar as revisões do componente V2. A primeira tentativa de retorno síncrono revelou retenção indevida do zoom; a versão final foi verificada após reinício.",
+    "Capturas podem apresentar menor nitidez pela ferramenta; observações DOM e arquivos exportados foram verificados separadamente."
+  ],
+  "preservacao": [
+    "Motor econômico, arquivos de estado, Módulo 01 e dependências inalterados.",
+    "Documentos locais não versionados e provas anteriores preservados. Sem escrita no Google Drive.",
+    "Sem Experimento B, push, merge, PR ou deploy."
+  ]
+}
