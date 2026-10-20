@@ -100,6 +100,7 @@ def renderizar_individual(*, acoes_cabecalho=None):
             st.button("Restaurar visualização",on_click=zoom,
                       help="Recupera a escala original desta perspectiva e foco, sem alterar a simulação.")
             st.checkbox("Ativar zoom pela roda no gráfico",key=chave("roda"),
+                        persist_state="session" if st.session_state.get("_lce_integrado", False) else None,
                         help="Desativado inicialmente para preservar a rolagem da página.")
             st.caption("Arraste uma região para ampliar; Pan move. A roda, quando ativada, amplia no gráfico e continua rolando a página fora dele.")
 

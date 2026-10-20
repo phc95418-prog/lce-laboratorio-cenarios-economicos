@@ -74,9 +74,11 @@ def renderizar_comparacao(estado, renderizar_variaveis):
             st.radio("Foco dos dois gráficos",FOCOS,key=chave("foco"),
                      index=FOCOS.index(c.foco),on_change=foco)
             st.button("Restaurar visualização comparativa",on_click=agir,args=(restaurar,))
-            modo_zoom = st.radio("Zoom comparativo",("Sincronizado","Independente"),key=chave("modo_zoom"))
+            modo_zoom = st.radio("Zoom comparativo",("Sincronizado","Independente"),key=chave("modo_zoom"),
+                persist_state="session" if st.session_state.get("_lce_integrado", False) else None)
             st.caption("Independente permite enquadramentos diferentes. Voltar a Sincronizado restaura a escala comum original.")
-            roda = st.checkbox("Ativar zoom pela roda nos gráficos",key=chave("roda"))
+            roda = st.checkbox("Ativar zoom pela roda nos gráficos",key=chave("roda"),
+                persist_state="session" if st.session_state.get("_lce_integrado", False) else None)
             st.caption("Arraste para ampliar; Pan move. Sincronizado mantém o mesmo enquadramento; Independente permite vistas distintas. A roda é opcional para preservar a rolagem da página.")
     st.caption("Zoom "+modo_zoom.lower()+" · "+("mesmas escalas" if modo_zoom=="Sincronizado" else "atenção: os enquadramentos podem diferir; comparação visual direta de escalas limitada")+" · curvas nos domínios próprios.")
     figuras, contexto = graficos_comparacao(estado)
