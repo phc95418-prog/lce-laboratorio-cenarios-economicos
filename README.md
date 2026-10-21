@@ -18,7 +18,7 @@ Projeto acadêmico independente de Pedro Henrique de Carvalho Almeida (Economia 
 
 O seletor da aplicação integrada alterna entre os módulos; os seletores de ambiente e experimento permanecem dentro de cada módulo. Os resultados são acompanhados por uma síntese econômica visível e pela seção opcional **Análise econômica e matemática**, com Leitura econômica, Estrutura matemática e Propriedades e limites. Ajuda, aparência e informações sobre os modelos ficam nos controles da interface.
 
-Os gráficos disponíveis no contexto vigente podem ser exportados em **PNG, SVG ou PDF**. As três exportações foram validadas na hospedagem Streamlit; a geração de PDF utiliza Chromium no servidor. Se o navegador não estiver disponível, PNG e SVG continuam acessíveis.
+Os gráficos disponíveis no contexto vigente podem ser exportados em **PNG, SVG ou PDF**. Os três formatos foram validados anteriormente na aplicação de homologação hospedada. Na aplicação oficial, o PDF foi gerado e baixado, mas sua inspeção visual ainda está pendente; os downloads de PNG e SVG foram solicitados, porém não ficaram acessíveis para inspeção no navegador automatizado. A geração de PDF utiliza Chromium no servidor. Se o navegador não estiver disponível, PNG e SVG continuam acessíveis.
 
 ## Execução local
 
@@ -57,7 +57,7 @@ Os componentes JavaScript e CSS usados pela interface estão no próprio reposit
 
 A [aplicação oficial](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/) está implantada no Streamlit Community Cloud a partir deste repositório, branch <code>main</code>, arquivo principal <code>lce_integrado.py</code> e Python 3.13. O serviço instala as dependências declaradas em <code>requirements.txt</code> e o Chromium declarado em <code>packages.txt</code>.
 
-Os Módulos 01 e 02 e a navegação entre eles funcionam nesse endereço. As exportações PNG, SVG e PDF foram verificadas na hospedagem; o PDF depende da instalação do Chromium. Consulte a [documentação de implantação do Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) para detalhes da plataforma.
+Os Módulos 01 e 02 e a navegação entre eles funcionam nesse endereço. Na homologação hospedada, PNG, SVG e PDF foram validados. Na aplicação oficial, ainda falta inspecionar visualmente o PDF baixado e conferir os downloads de PNG, SVG e PDF em um navegador convencional. O PDF depende da instalação do Chromium. Consulte a [documentação de implantação do Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) para detalhes da plataforma.
 
 ## Alcance dos modelos
 
