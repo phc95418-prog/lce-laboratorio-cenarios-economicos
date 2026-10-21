@@ -2,7 +2,7 @@
 
 O LCE é um laboratório acadêmico interativo para investigar mecanismos econômicos com modelos teóricos e cenários controlados. A aplicação integrada reúne dois módulos, com navegação visível entre eles e estados de investigação próprios.
 
-**Estado das versões:** esta branch contém a aplicação integrada em desenvolvimento, validada localmente e ainda não publicada. A [aplicação pública atual](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/) corresponde à versão estável anterior do Módulo 01 (v1.2.1); seu endereço não é uma demonstração da integração.
+**Aplicação oficial:** [acesse o LCE com os Módulos 01 e 02 integrados](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/). A versão pública é executada pela branch `main`, com `lce_integrado.py` como arquivo principal. A versão anterior do Módulo 01 (v1.2.1) é histórica e permanece recuperável pela [tag v1.2.1](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/tree/v1.2.1).
 
 Projeto acadêmico independente de Pedro Henrique de Carvalho Almeida (Economia — IDP).
 
@@ -18,7 +18,7 @@ Projeto acadêmico independente de Pedro Henrique de Carvalho Almeida (Economia 
 
 O seletor da aplicação integrada alterna entre os módulos; os seletores de ambiente e experimento permanecem dentro de cada módulo. Os resultados são acompanhados por uma síntese econômica visível e pela seção opcional **Análise econômica e matemática**, com Leitura econômica, Estrutura matemática e Propriedades e limites. Ajuda, aparência e informações sobre os modelos ficam nos controles da interface.
 
-Os gráficos disponíveis no contexto vigente podem ser exportados em **PNG, SVG ou PDF**. A geração de PDF depende de Chrome/Chromium no servidor. Ela foi validada localmente, mas ainda precisa ser confirmada no Streamlit Community Cloud; se o navegador não estiver disponível, PNG e SVG continuam acessíveis.
+Os gráficos disponíveis no contexto vigente podem ser exportados em **PNG, SVG ou PDF**. As três exportações foram validadas na hospedagem Streamlit; a geração de PDF utiliza Chromium no servidor. Se o navegador não estiver disponível, PNG e SVG continuam acessíveis.
 
 ## Execução local
 
@@ -53,11 +53,11 @@ O endereço local padrão é http://localhost:8501. Para executar os módulos se
 
 Os componentes JavaScript e CSS usados pela interface estão no próprio repositório. A aplicação não requer um servidor auxiliar iniciado manualmente. Os testes versionados estão nos arquivos <code>testar_*.py</code> e <code>testar_*.mjs</code>; a regressão integrada foi executada localmente em etapa anterior.
 
-## Preparação para publicação futura
+## Implantação oficial
 
-Ao criar ou configurar **uma futura aplicação integrada** no Streamlit Community Cloud, selecionar explicitamente o repositório e a branch aprovados, <code>lce_integrado.py</code> como arquivo principal e Python 3.13. O serviço lê <code>requirements.txt</code> e <code>packages.txt</code> da raiz. Essa configuração não altera por si só a aplicação pública anterior; qualquer integração à branch pública ou troca de entrypoint exige decisão própria.
+A [aplicação oficial](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/) está implantada no Streamlit Community Cloud a partir deste repositório, branch <code>main</code>, arquivo principal <code>lce_integrado.py</code> e Python 3.13. O serviço instala as dependências declaradas em <code>requirements.txt</code> e o Chromium declarado em <code>packages.txt</code>.
 
-Após a implantação, conferir abertura dos dois módulos, navegação e estados, gráficos, temas, exportações PNG/SVG e uma geração real de PDF. Para PDF, verificar também os logs de instalação do Chromium e a presença de um arquivo baixado e legível. A preparação local não comprova o funcionamento em Linux hospedado. Consulte a [documentação de implantação do Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
+Os Módulos 01 e 02 e a navegação entre eles funcionam nesse endereço. As exportações PNG, SVG e PDF foram verificadas na hospedagem; o PDF depende da instalação do Chromium. Consulte a [documentação de implantação do Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) para detalhes da plataforma.
 
 ## Alcance dos modelos
 
