@@ -1,64 +1,217 @@
 # LCE — Laboratório de Cenários Econômicos
 
-O LCE é um laboratório acadêmico interativo para investigar mecanismos econômicos com modelos teóricos e cenários controlados. A aplicação integrada reúne dois módulos, com navegação visível entre eles e estados de investigação próprios.
+O **Laboratório de Cenários Econômicos (LCE)** é uma plataforma acadêmica interativa voltada ao estudo da Economia por meio da experimentação.
 
-**Aplicação oficial:** [acesse o LCE com os Módulos 01 e 02 integrados](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/). A versão pública é executada pela branch `main`, com `lce_integrado.py` como arquivo principal. A versão anterior do Módulo 01 (v1.2.1) é histórica e permanece recuperável pela [tag v1.2.1](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/tree/v1.2.1).
+Seu propósito é transformar modelos econômicos tradicionalmente apresentados por equações e gráficos estáticos em ambientes nos quais o usuário pode modificar parâmetros, observar o comportamento das curvas e dos indicadores e investigar relações de causa e efeito.
+
+Organizado em módulos temáticos, o LCE busca facilitar a compreensão não apenas de **o que acontece** quando determinadas condições econômicas mudam, mas também de **por que essas mudanças ocorrem**.
+
+A plataforma utiliza modelos teóricos com hipóteses explícitas, permitindo explorar diferentes cenários e relacionar seus resultados às estruturas matemáticas e aos conceitos econômicos correspondentes.
+
+**Acesse a aplicação:**
+
+[**Abrir o Laboratório de Cenários Econômicos — LCE**](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/)
+
+**Versão estável atual:** [LCE v2.0.0 — Módulos 01 e 02 integrados](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/tag/v2.0.0)
 
 Projeto acadêmico independente de Pedro Henrique de Carvalho Almeida (Economia — IDP).
 
-## Módulos e investigação
+---
 
-**Módulo 01 — Incidência Tributária, Elasticidades e Bem-Estar.** Explora um imposto específico por unidade em mercados competitivos com oferta e demanda inversas lineares. Apresenta preços, quantidades, elasticidades iniciais, arrecadação, excedentes e perda de eficiência. Seus três ambientes são:
+## 1. Organização do laboratório
 
-- **Exploração livre:** altera parâmetros das curvas ou elasticidades e compara o equilíbrio sem e com imposto no mercado selecionado.
-- **Experimento A — Quem suporta o imposto?:** compara três mercados com repartições tributárias diferentes sob condições controladas.
-- **Experimento B — Quanto o imposto distorce o mercado?:** compara três sensibilidades da quantidade e as respectivas distorções.
+O LCE está organizado em módulos dedicados a diferentes problemas econômicos. Cada módulo combina modelos matemáticos, representações gráficas interativas, indicadores econômicos e ambientes de investigação.
 
-**Módulo 02 — Decisões da Firma e Estruturas de Mercado.** O Experimento A permite investigar individualmente receita, custos, lucro, decisões de produção e comparação de cenários. O Experimento B compara concorrência e monopólio, incluindo excedentes, transferência e perda de eficiência. Ambos preservam seus controles e perspectivas próprios.
+A aplicação integrada permite navegar entre os módulos, preservar parâmetros de investigação e explorar diferentes situações sem precisar reiniciar a plataforma.
 
-O seletor da aplicação integrada alterna entre os módulos; os seletores de ambiente e experimento permanecem dentro de cada módulo. Os resultados são acompanhados por uma síntese econômica visível e pela seção opcional **Análise econômica e matemática**, com Leitura econômica, Estrutura matemática e Propriedades e limites. Ajuda, aparência e informações sobre os modelos ficam nos controles da interface.
+Atualmente, o laboratório conta com dois módulos.
 
-Os gráficos disponíveis no contexto vigente podem ser exportados em **PNG, SVG ou PDF**. Os três formatos foram validados anteriormente na aplicação de homologação hospedada. Na aplicação oficial, o PDF foi gerado e baixado, mas sua inspeção visual ainda está pendente; os downloads de PNG e SVG foram solicitados, porém não ficaram acessíveis para inspeção no navegador automatizado. A geração de PDF utiliza Chromium no servidor. Se o navegador não estiver disponível, PNG e SVG continuam acessíveis.
+### Módulo 01 — Incidência Tributária, Elasticidades e Bem-Estar
 
-## Execução local
+Investiga os efeitos de um imposto específico por unidade em mercados competitivos, utilizando modelos de oferta e demanda lineares.
 
-Use Python 3.13 e execute os comandos a partir da raiz do repositório. No Windows:
+O módulo permite observar como a tributação modifica os preços pagos pelos consumidores, os preços recebidos pelos produtores, as quantidades transacionadas, a arrecadação governamental e os excedentes econômicos.
 
-~~~powershell
+Está organizado em três ambientes:
+
+- **Exploração livre:** permite modificar parâmetros das curvas ou elasticidades e observar os equilíbrios de mercado antes e depois da introdução do imposto.
+- **Experimento A — Quem suporta o imposto?:** investiga como diferentes condições de oferta e demanda afetam a distribuição do ônus tributário entre consumidores e produtores.
+- **Experimento B — Quanto o imposto distorce o mercado?:** compara mercados com diferentes sensibilidades da quantidade e analisa os efeitos da tributação sobre transações, arrecadação e perda de eficiência.
+
+O objetivo é compreender como as características do mercado influenciam tanto a distribuição do imposto quanto suas consequências para o bem-estar econômico.
+
+### Módulo 02 — Decisões da Firma e Estruturas de Mercado
+
+Investiga decisões de produção e suas consequências econômicas, considerando relações entre demanda, receita, custos, lucro e organização dos mercados.
+
+O módulo contém dois experimentos:
+
+- **Experimento A — Decisões da firma:** permite analisar receita, custos, lucro e decisões de produção. O usuário pode modificar parâmetros, examinar diferentes objetivos e comparar os resultados obtidos.
+- **Experimento B — Concorrência e monopólio:** compara resultados de mercados competitivos e monopolistas, destacando diferenças de preços, quantidades, excedentes econômicos e eficiência.
+
+O objetivo é compreender como as decisões econômicas dependem das condições de demanda, da estrutura de custos e da organização do mercado.
+
+---
+
+## 2. Como funciona a investigação
+
+A proposta do LCE é permitir que o usuário participe ativamente da construção e da interpretação dos cenários econômicos.
+
+Em vez de apresentar apenas o resultado de um modelo, a plataforma permite explorar o processo pelo qual esse resultado é determinado.
+
+As principais possibilidades são:
+
+1. **Modificar parâmetros:** alterar características econômicas e observar como essas mudanças afetam o comportamento do modelo.
+2. **Visualizar resultados:** acompanhar curvas, equilíbrios, indicadores e outras representações gráficas.
+3. **Comparar cenários:** identificar diferenças entre situações econômicas e investigar suas causas.
+4. **Relacionar matemática e economia:** consultar expressões, propriedades e interpretações dos resultados.
+5. **Investigar hipóteses e limites:** compreender as condições sob as quais as conclusões do modelo são válidas.
+
+### Análise econômica e matemática
+
+Os experimentos disponibilizam recursos de interpretação organizados em três perspectivas complementares:
+
+- **Leitura econômica:** interpretação dos resultados e dos mecanismos envolvidos.
+- **Estrutura matemática:** apresentação das relações e expressões que sustentam o modelo.
+- **Propriedades e limites:** discussão das hipóteses, condições de validade e limitações das conclusões.
+
+A plataforma também oferece recursos de ajuda contextual e informações sobre os modelos utilizados.
+
+### Exportação de gráficos
+
+Os gráficos podem ser exportados nos formatos **PNG, SVG e PDF**, permitindo sua utilização em estudos, apresentações e materiais acadêmicos.
+
+Os três formatos foram validados na aplicação de homologação hospedada, e o funcionamento dos downloads foi confirmado preliminarmente na aplicação oficial.
+
+A geração de PDF utiliza Chromium no servidor.
+
+---
+
+## 3. Acesso à aplicação
+
+A versão pública do LCE está disponível no Streamlit Community Cloud:
+
+**[Acessar o LCE](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/)**
+
+A aplicação utiliza:
+
+- **Repositório:** `phc95418-prog/lce-laboratorio-cenarios-economicos`
+- **Branch:** `main`
+- **Arquivo principal:** `lce_integrado.py`
+- **Python:** 3.13
+- **Versão estável:** `v2.0.0`
+
+Não é necessário instalar o projeto para utilizar a versão hospedada. Basta acessar o endereço pelo navegador.
+
+---
+
+## 4. Execução local
+
+Para executar o LCE localmente, utilize Python 3.13 e execute os comandos a partir da pasta raiz do repositório.
+
+### Windows
+
+```powershell
 py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m streamlit run lce_integrado.py
-~~~
+```
 
-Em Linux ou macOS, com Python 3.13 disponível:
+### Linux ou macOS
 
-~~~sh
+```sh
 python3.13 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m streamlit run lce_integrado.py
-~~~
+```
 
-O endereço local padrão é http://localhost:8501. Para executar os módulos separadamente durante o desenvolvimento, use <code>app.py</code> para o Módulo 01 ou <code>lce_modulo02.py</code> para o Módulo 02 no lugar de <code>lce_integrado.py</code>. A pasta <code>.venv</code> é local e está excluída do Git.
+O endereço local padrão é:
 
-## Organização e dependências
+`http://localhost:8501`
 
-| Caminho | Papel |
+Os módulos também podem ser executados separadamente durante o desenvolvimento:
+
+- `app.py` — Módulo 01.
+- `lce_modulo02.py` — Módulo 02.
+- `lce_integrado.py` — Aplicação integrada.
+
+A pasta `.venv` contém o ambiente virtual local e não é versionada no Git.
+
+---
+
+## 5. Organização técnica
+
+O projeto foi desenvolvido em Python, utilizando Streamlit para a interface e Plotly para as visualizações gráficas interativas.
+
+Seus principais arquivos e componentes são:
+
+| Caminho | Função |
 |---|---|
-| <code>lce_integrado.py</code> | Ponto de entrada da aplicação integrada e seleção dos módulos. |
-| <code>app.py</code>, <code>modelo_mercado.py</code>, <code>experimentos.py</code>, <code>visualizacoes.py</code> | Interface, motor, cenários e gráficos do Módulo 01. |
-| <code>analise_modulo01.py</code> e arquivos <code>*modulo01*</code> | Análises, recursos de interface e exportação do Módulo 01. |
-| <code>lce_modulo02.py</code> e <code>modulo_02/</code> | Entrada independente, motor, estados, gráficos e interface do Módulo 02. |
-| <code>requirements.txt</code> | Dependências Python: Streamlit, Plotly e pandas. |
-| <code>packages.txt</code> | Solicitação de instalação de Chromium para PDF na hospedagem Linux. |
+| `lce_integrado.py` | Entrada da aplicação integrada e navegação entre os módulos. |
+| `app.py` | Entrada independente do Módulo 01. |
+| `modelo_mercado.py`, `experimentos.py` e `visualizacoes.py` | Modelos, experimentos e representações gráficas do Módulo 01. |
+| `analise_modulo01.py` e arquivos auxiliares do Módulo 01 | Análises e recursos de interface. |
+| `lce_modulo02.py` | Entrada independente do Módulo 02. |
+| `modulo_02/` | Componentes econômicos, matemáticos e de interface do Módulo 02. |
+| `requirements.txt` | Dependências Python do projeto. |
+| `packages.txt` | Provisionamento do Chromium para exportações em PDF na hospedagem Linux. |
 
-Os componentes JavaScript e CSS usados pela interface estão no próprio repositório. A aplicação não requer um servidor auxiliar iniciado manualmente. Os testes versionados estão nos arquivos <code>testar_*.py</code> e <code>testar_*.mjs</code>; a regressão integrada foi executada localmente em etapa anterior.
+Os recursos JavaScript e CSS utilizados pela interface estão incluídos no próprio repositório.
 
-## Implantação oficial
+O projeto também contém testes automatizados e materiais de validação utilizados durante o desenvolvimento dos módulos e de sua integração.
 
-A [aplicação oficial](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/) está implantada no Streamlit Community Cloud a partir deste repositório, branch <code>main</code>, arquivo principal <code>lce_integrado.py</code> e Python 3.13. O serviço instala as dependências declaradas em <code>requirements.txt</code> e o Chromium declarado em <code>packages.txt</code>.
+### Implantação
 
-Os Módulos 01 e 02 e a navegação entre eles funcionam nesse endereço. Na homologação hospedada, PNG, SVG e PDF foram validados. Na aplicação oficial, ainda falta inspecionar visualmente o PDF baixado e conferir os downloads de PNG, SVG e PDF em um navegador convencional. O PDF depende da instalação do Chromium. Consulte a [documentação de implantação do Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) para detalhes da plataforma.
+A aplicação oficial é executada no Streamlit Community Cloud a partir da branch `main`, utilizando `lce_integrado.py` como arquivo principal.
 
-## Alcance dos modelos
+As dependências Python são declaradas em `requirements.txt`, enquanto `packages.txt` solicita a instalação de Chromium no ambiente hospedado.
 
-Os resultados são simulações teóricas condicionadas a hipóteses explícitas, não estimativas empíricas nem previsões de mercados reais. O Módulo 01 usa equilíbrio parcial estático, curvas lineares, bem homogêneo e imposto por unidade; a leitura dos excedentes requer as condições de bem-estar descritas na [Arquitetura Funcional e Matemática v1.1](https://docs.google.com/document/d/1-1l1HtqIrwz6G9piHSg244UXDW0aAUzhfTf9vQIf07A/edit). O Módulo 02 trabalha com demanda inversa linear e custos especificados para comparar decisões da firma e estruturas de mercado. Os modelos não incorporam, por exemplo, dinâmica, heterogeneidade ampla, externalidades ou calibração com dados observados.
+Para informações adicionais sobre a plataforma, consulte a [documentação do Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
+
+---
+
+## 6. Alcance e limitações dos modelos
+
+O LCE utiliza modelos teóricos de Economia com hipóteses explícitas. Seus resultados representam consequências matemáticas e econômicas dessas hipóteses e dos parâmetros definidos pelo usuário.
+
+**As simulações não constituem previsões de mercados reais nem estimativas empíricas.**
+
+O Módulo 01 utiliza modelos estáticos de equilíbrio parcial, com curvas lineares de oferta e demanda, bem homogêneo e tributação específica por unidade.
+
+A interpretação dos excedentes econômicos como medidas de bem-estar depende de condições teóricas que devem ser consideradas na análise dos resultados.
+
+O Módulo 02 utiliza funções de demanda e custos especificadas para investigar decisões da firma e comparar estruturas de mercado.
+
+Os modelos não incorporam necessariamente elementos como dinâmica intertemporal, heterogeneidade ampla entre agentes, externalidades ou calibração com dados observados.
+
+Essas simplificações permitem isolar mecanismos econômicos e facilitar sua compreensão, mas também delimitam o alcance das conclusões.
+
+Para aprofundamento das hipóteses e dos fundamentos matemáticos do Módulo 01, consulte a [Arquitetura Funcional e Matemática v1.1](https://docs.google.com/document/d/1-1l1HtqIrwz6G9piHSg244UXDW0aAUzhfTf9vQIf07A/edit).
+
+---
+
+## 7. Versões do projeto
+
+### v2.0.0 — Módulos 01 e 02 integrados
+
+Primeira versão oficial com os dois módulos reunidos em uma única aplicação.
+
+Inclui a modernização do Módulo 01, a implementação do Módulo 02, a integração da navegação, os recursos de análise econômica e matemática e a exportação de gráficos.
+
+[Consultar a release v2.0.0](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/tag/v2.0.0)
+
+### v1.2.1 — Módulo 01
+
+Versão histórica anterior à integração, preservada para consulta e recuperação do código.
+
+[Consultar a release v1.2.1](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/tag/v1.2.1)
+
+---
+
+## 8. Perspectiva de desenvolvimento
+
+O LCE é um projeto acadêmico em evolução.
+
+O desenvolvimento de novos módulos e o aprimoramento dos existentes poderão ampliar os problemas econômicos investigados, aprofundar as possibilidades de comparação e incorporar novas formas de exploração dos modelos.
+
+A orientação central do projeto permanece a mesma: **utilizar a experimentação para transformar relações matemáticas em mecanismos econômicos que possam ser observados, investigados e compreendidos.**
