@@ -483,6 +483,17 @@ def hicks_decomposition(reference: Reference, current: CobbCase,
                            _decimal_fraction((px1 / px0) * _fraction(old.income, policy), work),
                            Basket(Decimal(0), Decimal(0)), total, total,
                            Decimal(0), Decimal(0), work)
+    same_utility = compare_scenarios(reference, current, policy=policy)
+    if same_utility.utility_order == "igual":
+        # Pela unicidade Cobb–Douglas, U(C)=U₀ implica H=C e e=R exatamente.
+        # A comparação só retorna igualdade quando a demonstra algebricamente.
+        work = min(max(precision, policy.initial_precision), policy.max_derived_precision)
+        total = Basket(_decimal_fraction(new_x - old_x, work),
+                       _decimal_fraction(new_y - old_y, work))
+        return HicksResult("calculado", None, reference, current,
+                           same_utility.current_solution.basket, new.income,
+                           total, Basket(Decimal(0), Decimal(0)), total,
+                           Decimal(0), Decimal(0), work)
     exact_total_zero = {"etx": new_x == old_x, "ety": new_y == old_y}
     structural = exact_total_zero
     while precision + policy.guard_digits <= policy.max_derived_precision:
