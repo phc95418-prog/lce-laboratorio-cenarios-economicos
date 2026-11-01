@@ -33,6 +33,12 @@ export default function(component) {
     root.dataset.plotlyVersion = Plotly.version;
     let current = view;
     root.on('plotly_click', event => {
+      if (data.clickTargets) {
+        const point = event.points?.find(p => data.clickTargets[String(p.curveNumber)]);
+        const target = point && data.clickTargets[String(point.curveNumber)];
+        if (target) setTriggerValue('clicked', {target, id: Date.now()});
+        return;
+      }
       const x = Number(event.xvals?.[0]);
       const y = Number(event.yvals?.[0]);
       if (Number.isFinite(x) && Number.isFinite(y)) {
