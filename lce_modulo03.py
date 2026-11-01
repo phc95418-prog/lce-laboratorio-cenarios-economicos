@@ -1,16 +1,19 @@
-"""Entrypoint experimental independente do Módulo 03 e seus três modos."""
+"""Entrypoint experimental independente do Módulo 03 e seus quatro ambientes."""
 
 import streamlit as st
 
 from modulo_03.interface_livre import render as render_livre
 from modulo_03.interface_individual import render as render_individual
 from modulo_03.interface_comparacao_consumidores import render as render_comparacao
+from modulo_03.interface_experimento_b import render as render_experimento_b
 
 
 PAGES = ("Exploração livre", "Experimento A · Escolha individual",
-         "Experimento A · Comparação entre consumidores")
-PREFIXES = ("m03_livre_", "m03_ai_", "m03_ac_")
-RENDERERS = (render_livre, render_individual, render_comparacao)
+         "Experimento A · Comparação entre consumidores",
+         "Experimento B · Mudanças na escolha ótima")
+PREFIXES = ("m03_livre_", "m03_ai_", "m03_ac_", "m03_eb_")
+RENDERERS = (render_livre, render_individual, render_comparacao,
+             render_experimento_b)
 
 
 def _switch_page() -> None:
