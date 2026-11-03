@@ -5,7 +5,7 @@ const loadPlotly = () => {
   if (!window.__m03_plotly_load) {
     window.__m03_plotly_load = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = '/app/static/m03_plotly_3_7_0.min.js';
+      script.src = 'app/static/m03_plotly_3_7_0.min.js';
       script.onload = () => window.Plotly?.version === EXPECTED
         ? resolve(window.Plotly) : reject(new Error('Versão inesperada de Plotly.js: ' + window.Plotly?.version));
       script.onerror = () => reject(new Error('Plotly.js local indisponível; inicie com --server.enableStaticServing true'));
