@@ -37,6 +37,7 @@ def _initial_state() -> None:
     st.session_state.setdefault(_key("view"), None)
     st.session_state.setdefault(_key("query"), None)
     st.session_state.setdefault(_key("notice"), None)
+    st.session_state.setdefault(_key("slider_epoch"), 0)
 
 
 def _values() -> dict[str, str]:
@@ -51,6 +52,8 @@ def _set_values(values: dict[str, str]) -> None:
 
 def _reset() -> None:
     _set_values(INITIAL)
+    # Widgets da referência anterior podem reenviar a posição antiga após o reset.
+    st.session_state[_key("slider_epoch")] += 1
     st.session_state[_key("reference")] = None
     st.session_state[_key("curve_A")] = False
     st.session_state[_key("curve_C")] = False
@@ -134,11 +137,13 @@ def _control(name: str, *, disabled: bool = False) -> None:
         st.caption("Preferência congelada com a referência.")
         return
     spec = slider_spec(name, exact)
-    slider_key = _key(f"slider_{name}_{spec.minimum}_{spec.maximum}")
-    if slider_key not in st.session_state or st.session_state[slider_key] != spec.position:
+    epoch = st.session_state[_key("slider_epoch")]
+    slider_key = _key(f"slider_{name}_{spec.minimum}_{spec.maximum}_{epoch}")
+    initial_position = spec.position if slider_key not in st.session_state else None
+    if initial_position is None and st.session_state[slider_key] != spec.position:
         st.session_state[slider_key] = spec.position
     st.slider(f"Ajuste visual de {LABELS[name]}", min_value=spec.minimum,
-              max_value=spec.maximum, step=spec.step, format="%.9g",
+              max_value=spec.maximum, value=initial_position, step=spec.step, format="%.9g",
               key=slider_key, on_change=_commit_slider, args=(name, slider_key))
     if spec.expanded or spec.approximate:
         st.caption(f"Valor econômico confirmado: {exact}. O slider é uma aproximação visual.")

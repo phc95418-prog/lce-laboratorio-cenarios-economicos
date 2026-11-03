@@ -174,6 +174,9 @@ def _controls() -> None:
     with col_y:
         st.text_input("Quantidade de Y", key=_key("field_Y"),
                       on_change=_commit_basket)
+    manual = st.session_state[_key("manual")]
+    if manual is not None and max(len(str(manual.x)), len(str(manual.y))) > 12:
+        st.caption(f"Coordenadas confirmadas: X = {manual.x}; Y = {manual.y}.")
     st.button("Limpar cesta manual", on_click=_clear_basket,
               disabled=st.session_state[_key("manual")] is None)
     with st.popover("Restaurar exploração"):
