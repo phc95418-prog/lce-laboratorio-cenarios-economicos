@@ -29,7 +29,7 @@ def _switch_page() -> None:
     st.session_state["m03_active_page"] = new
 
 
-st.set_page_config(page_title="LCE · Módulo 03 — desenvolvimento isolado", layout="wide")
+st.set_page_config(page_title="LCE · Módulo 03 — Decisões do Consumidor", layout="wide")
 st.session_state.setdefault("m03_active_page", PAGES[0])
 st.session_state.setdefault("m03_page", st.session_state["m03_active_page"])
 st.radio("Ambiente do Módulo 03", PAGES, horizontal=True, key="m03_page",

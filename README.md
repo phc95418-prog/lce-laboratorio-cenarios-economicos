@@ -12,7 +12,9 @@ A plataforma utiliza modelos teóricos com hipóteses explícitas, permitindo ex
 
 [**Abrir o Laboratório de Cenários Econômicos — LCE**](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/)
 
-**Versão estável atual:** [LCE v2.0.0 — Módulos 01 e 02 integrados](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/tag/v2.0.0)
+**Versão oficial atual:** [LCE v2.0.0 — Módulos 01 e 02 integrados](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/tag/v2.0.0)
+
+**Homologação dos três módulos:** [LCE com o Módulo 03](https://lce-integrado-m03-homologacao.streamlit.app/). A aplicação oficial acompanha a branch `main`; a homologação utiliza a branch de integração.
 
 Projeto acadêmico independente de Pedro Henrique de Carvalho Almeida (Economia — IDP).
 
@@ -24,7 +26,7 @@ O LCE está organizado em módulos dedicados a diferentes problemas econômicos.
 
 A aplicação integrada permite navegar entre os módulos, preservar parâmetros de investigação e explorar diferentes situações sem precisar reiniciar a plataforma.
 
-Atualmente, o laboratório conta com dois módulos.
+O código integrado reúne três módulos.
 
 ### Módulo 01 — Incidência Tributária, Elasticidades e Bem-Estar
 
@@ -51,6 +53,19 @@ O módulo contém dois experimentos:
 
 O objetivo é compreender como as decisões econômicas dependem das condições de demanda, da estrutura de custos e da organização do mercado.
 
+### Módulo 03 — Decisões do Consumidor
+
+Investiga a escolha de cestas sob renda, preços e preferências dados. Cobb–Douglas é o modelo principal; substitutos e complementares perfeitos permitem examinar cantos, quinas e conjuntos de ótimos no Experimento A individual.
+
+Seus quatro ambientes são:
+
+- **Exploração livre:** permite ajustar renda, preços, preferências e cesta manual, observando orçamento, utilidade e, opcionalmente, a escolha ótima.
+- **Experimento A — Escolha individual:** compara uma cesta escolhida pelo usuário com a solução ótima do modelo.
+- **Experimento A — Comparação entre consumidores:** compara escolhas ótimas sob a mesma renda e os mesmos preços, com preferências diferentes.
+- **Experimento B — Mudanças na escolha ótima:** compara uma referência fixada com um cenário atual de renda e preços; oferece a decomposição de Hicks quando suas condições são satisfeitas.
+
+As utilidades são ordinais; diferenças entre números de utilidade de consumidores distintos não medem bem-estar interpessoal.
+
 ---
 
 ## 2. Como funciona a investigação
@@ -69,7 +84,7 @@ As principais possibilidades são:
 
 ### Análise econômica e matemática
 
-Os experimentos disponibilizam recursos de interpretação organizados em três perspectivas complementares:
+Os Módulos 01 e 02 disponibilizam recursos de interpretação organizados em três perspectivas complementares:
 
 - **Leitura econômica:** interpretação dos resultados e dos mecanismos envolvidos.
 - **Estrutura matemática:** apresentação das relações e expressões que sustentam o modelo.
@@ -77,11 +92,13 @@ Os experimentos disponibilizam recursos de interpretação organizados em três 
 
 A plataforma também oferece recursos de ajuda contextual e informações sobre os modelos utilizados.
 
+O Módulo 03 também apresenta **Desenvolvimento matemático** quando útil à obtenção das soluções.
+
 ### Exportação de gráficos
 
-Os gráficos podem ser exportados nos formatos **PNG, SVG e PDF**, permitindo sua utilização em estudos, apresentações e materiais acadêmicos.
+Nos gráficos com comandos próprios de exportação dos Módulos 01 e 02, estão disponíveis **PNG, SVG e PDF** conforme o contexto. O Módulo 03 oferece o download **PNG** do gráfico pelo Plotly. Esses arquivos podem ser utilizados em estudos, apresentações e materiais acadêmicos.
 
-Os três formatos foram validados na aplicação de homologação hospedada, e o funcionamento dos downloads foi confirmado preliminarmente na aplicação oficial.
+PNG, SVG e PDF do gráfico E4 do Módulo 01 foram baixados e inspecionados na homologação hospedada; houve também amostras de SVG do Módulo 02 e PNG do Módulo 03. A conferência não abrange todas as combinações de gráficos e formatos. Na aplicação oficial anterior, o funcionamento dos downloads foi confirmado apenas preliminarmente.
 
 A geração de PDF utiliza Chromium no servidor.
 
@@ -99,7 +116,7 @@ A aplicação utiliza:
 - **Branch:** `main`
 - **Arquivo principal:** `lce_integrado.py`
 - **Python:** 3.13
-- **Versão estável:** `v2.0.0`
+- **Release oficial atual:** `v2.0.0`
 
 Não é necessário instalar o projeto para utilizar a versão hospedada. Basta acessar o endereço pelo navegador.
 
@@ -133,6 +150,7 @@ Os módulos também podem ser executados separadamente durante o desenvolvimento
 
 - `app.py` — Módulo 01.
 - `lce_modulo02.py` — Módulo 02.
+- `lce_modulo03.py` — Módulo 03.
 - `lce_integrado.py` — Aplicação integrada.
 
 A pasta `.venv` contém o ambiente virtual local e não é versionada no Git.
@@ -153,6 +171,9 @@ Seus principais arquivos e componentes são:
 | `analise_modulo01.py` e arquivos auxiliares do Módulo 01 | Análises e recursos de interface. |
 | `lce_modulo02.py` | Entrada independente do Módulo 02. |
 | `modulo_02/` | Componentes econômicos, matemáticos e de interface do Módulo 02. |
+| `lce_modulo03.py` e `modulo_03/` | Entrada independente, núcleo, estados e interfaces do Módulo 03. |
+| `static/m03_plotly_3_7_0.min.js` | Bundle Plotly.js usado pelo gráfico interativo do Módulo 03. |
+| `.streamlit/config.toml` | Habilita o serviço de recursos estáticos para o bundle do Módulo 03. |
 | `requirements.txt` | Dependências Python do projeto. |
 | `packages.txt` | Provisionamento do Chromium para exportações em PDF na hospedagem Linux. |
 
@@ -164,7 +185,7 @@ O projeto também contém testes automatizados e materiais de validação utiliz
 
 A aplicação oficial é executada no Streamlit Community Cloud a partir da branch `main`, utilizando `lce_integrado.py` como arquivo principal.
 
-As dependências Python são declaradas em `requirements.txt`, enquanto `packages.txt` solicita a instalação de Chromium no ambiente hospedado.
+As dependências Python são declaradas em `requirements.txt`, enquanto `packages.txt` solicita a instalação de Chromium no ambiente hospedado. `.streamlit/config.toml` habilita a entrega do bundle Plotly.js do Módulo 03; a execução local com `lce_integrado.py` usa essa configuração automaticamente.
 
 Para informações adicionais sobre a plataforma, consulte a [documentação do Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
 
@@ -181,6 +202,8 @@ O Módulo 01 utiliza modelos estáticos de equilíbrio parcial, com curvas linea
 A interpretação dos excedentes econômicos como medidas de bem-estar depende de condições teóricas que devem ser consideradas na análise dos resultados.
 
 O Módulo 02 utiliza funções de demanda e custos especificadas para investigar decisões da firma e comparar estruturas de mercado.
+
+O Módulo 03 representa escolhas de dois bens sob preferências modeladas, renda e preços dados; seus resultados de utilidade são ordinais e não reproduzem integralmente o comportamento real dos consumidores.
 
 Os modelos não incorporam necessariamente elementos como dinâmica intertemporal, heterogeneidade ampla entre agentes, externalidades ou calibração com dados observados.
 

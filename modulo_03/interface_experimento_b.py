@@ -300,7 +300,7 @@ def render() -> None:
     _apply_pending()
     reference = st.session_state[_key("reference")]
     st.title("Módulo 03 · Decisões do Consumidor")
-    st.caption("Experimento B · Mudanças na escolha ótima · ambiente independente em desenvolvimento")
+    st.caption("Experimento B · Mudanças na escolha ótima · Módulo 03 — Decisões do Consumidor")
     st.write("Como renda e preços modificam uma escolha sob preferências constantes?")
     left, right = st.columns([1, 2.1], gap="large")
     with left:

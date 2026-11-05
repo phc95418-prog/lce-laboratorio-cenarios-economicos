@@ -238,7 +238,7 @@ def render() -> None:
         st.session_state[_key("last_click_id")] = click["id"]
         _set_basket_from_click(click)
     st.title("Módulo 03 · Decisões do Consumidor")
-    st.caption("Exploração livre · interface independente em desenvolvimento")
+    st.caption("Exploração livre · Módulo 03 — Decisões do Consumidor")
     st.write("Como renda, preços e preferências delimitam as cestas possíveis?")
     left, right = st.columns([1, 2.1], gap="large")
     with left:

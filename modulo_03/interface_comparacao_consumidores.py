@@ -181,7 +181,7 @@ def render() -> None:
     if st.session_state.pop(_key("reset_pending"), False):
         _reset()
     st.title("Módulo 03 · Decisões do Consumidor")
-    st.caption("Experimento A · Comparação entre consumidores · ambiente independente em desenvolvimento")
+    st.caption("Experimento A · Comparação entre consumidores · Módulo 03 — Decisões do Consumidor")
     st.write("Como preferências diferentes afetam as escolhas sob o mesmo orçamento?")
     left, right = st.columns([1, 2.1], gap="large")
     with left:
