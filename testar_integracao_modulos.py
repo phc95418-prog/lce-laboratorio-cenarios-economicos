@@ -13,6 +13,7 @@ from modulo_02.exportacao_pdf import navegador_pdf
 
 def iniciar(arquivo="lce_integrado.py"):
     # Cada AppTest possui um Runtime; os registros V2 precisam acompanhá-lo.
+    st.cache_resource.clear()
     for nome in ("interface_individual", "interface_comparacao", "interface_b", "janela_variaveis", "estrutura_visual"):
         sys.modules.pop("modulo_02."+nome, None)
     return AppTest.from_file(arquivo, default_timeout=20).run()
@@ -62,7 +63,7 @@ class Navegacao(unittest.TestCase):
         for arquivo,ativo in (("app.py","Módulo 01"),("lce_modulo02.py","Módulo 02")):
             at.switch_page(arquivo).run()
             self.assertFalse(at.exception)
-            self.assertEqual(len(at.get("page_link")),2)
+            self.assertEqual(len(at.get("page_link")),3)
             self.assertTrue(any("Em uso: "+ativo in c.value for c in at.caption))
 
     def test_analises_e_exportacoes_modernas_apos_retorno(self):
