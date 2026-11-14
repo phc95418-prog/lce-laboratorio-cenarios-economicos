@@ -23,8 +23,9 @@ def analise_b(e):
     preco=lambda x:"não aplicável" if x is None else numero(x)+" u.m./unidade"
     leitura=[f"Concorrência: Q_C={numero(c.curvas.q)} unidades e P_C={preco(c.preco_transacao)}. Monopólio: Q_M={numero(m.curvas.q)} unidades e P_M={preco(m.preco_transacao)}."]
     propriedades=[
-        f"Domínio gráfico confirmado: 0 ≤ Q ≤ {numero(p.q_max)} unidades; b>0, s>0. Os dois regimes usam a mesma demanda e os mesmos custos agregados.",
+        f"Domínio gráfico confirmado: 0 ≤ Q ≤ {numero(p.q_max)} unidades; b>0, s>0. Os dois regimes usam a mesma demanda e o mesmo custo marginal agregado. Na concorrência, essa curva representa a oferta agregada da indústria, não o custo marginal de uma firma isolada; no monopólio, pressupõe-se uma estrutura produtiva equivalente. As diferenças entre os equilíbrios decorrem da conduta de mercado, não de mudanças nos custos de produção.",
         "Custos agregados comparáveis pressupõem unidades produtivas equivalentes, tecnologia e preços de insumos invariantes, custos separáveis e ausência de custos de reorganização. Concorrência impõe tomada de preço; não há oligopólio, entrada/saída ou dinâmica.",
+        "O modelo pressupõe maximização de lucro, produto homogêneo e preço uniforme no monopólio. As decisões partem de funções de demanda e custo conhecidas, sem incerteza ou assimetrias de informação. Essas hipóteses delimitam a interpretação dos resultados.",
         "Os resultados são contrafactuais teóricos de equilíbrio parcial. Não são previsões de fusões reais, de justiça distributiva ou de eficiência dinâmica.",
     ]
     a,b,c0,s=(_latex(getattr(p,k)) for k in ("a","b","c","s"))

@@ -269,8 +269,11 @@ def _comparar(cenarios, experimento):
                         "Quantidade, arrecadação e peso morto podem mudar quando o imposto comum muda; não se atribui o efeito a uma variável isolada fora desse controle.",)
     else:
         base = "Comparação conjunta dos três mercados de B: P₀=60, Q₀=40 e mesmo imposto; b=d em cada mercado, mas variam a magnitude das inclinações e os interceptos compatíveis."
-        leitura = ("Nos equilíbrios interiores, inclinações menores e elasticidades iniciais maiores implicam maior queda de quantidade, "
-                   "menor base tributada e arrecadação e maior peso morto para o mesmo imposto positivo, apesar do repasse simétrico de 50% por lado. "
+        leitura = ("Como b=d em cada mercado, os coeficientes potenciais de repasse são 50% para cada lado; "
+                   "somente com imposto positivo e transações essa divisão corresponde à incidência efetiva. "
+                   "Nos equilíbrios interiores, inclinações menores e elasticidades iniciais maiores implicam maior queda de quantidade, "
+                   "menor base tributada e arrecadação e maior peso morto para o mesmo imposto positivo. "
+                   "Assim, o peso morto varia entre mercados ativos mesmo com a repartição relativa do imposto constante. "
                    "Com imposto zero, não há distorção nem incidência efetiva em nenhum mercado.",
                    "Os excedentes totais iniciais diferem entre os mercados: " + "; ".join(f"{nome}: ET₀={_moeda(r['et0'])} por período" for nome, r in dados) + ". "
                    "A comparação é condicional ao desenho controlado; não é ranking distributivo ou normativo.")
