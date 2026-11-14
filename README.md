@@ -12,7 +12,7 @@ A plataforma utiliza modelos teóricos com hipóteses explícitas, permitindo ex
 
 [**Abrir o Laboratório de Cenários Econômicos — LCE**](https://lce-laboratorio-cenarios-economicos-kisqpqyg4huaz9os7vuplv.streamlit.app/)
 
-**Versão oficial atual:** [LCE v2.0.0 — Módulos 01 e 02 integrados](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/tag/v2.0.0)
+**Versão oficial atual:** [Consultar a versão mais recente do LCE](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/latest)
 
 **Homologação dos três módulos:** [LCE com o Módulo 03](https://lce-integrado-m03-homologacao.streamlit.app/). A aplicação oficial acompanha a branch `main`; a homologação utiliza a branch de integração.
 
@@ -116,7 +116,7 @@ A aplicação utiliza:
 - **Branch:** `main`
 - **Arquivo principal:** `lce_integrado.py`
 - **Python:** 3.13
-- **Release oficial atual:** `v2.0.0`
+- **Release oficial atual:** [Consultar a versão mais recente do LCE](https://github.com/phc95418-prog/lce-laboratorio-cenarios-economicos/releases/latest)
 
 Não é necessário instalar o projeto para utilizar a versão hospedada. Basta acessar o endereço pelo navegador.
 
